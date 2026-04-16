@@ -3,399 +3,192 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Íslandsbanki - Online Banking</title>
+<title>Íslandsbanki — Wire Transfer Receipt</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: hsl(215, 50%, 23%);
-    --fg: #fff;
-    --card: hsl(215, 40%, 18%);
-    --card80: hsla(215, 40%, 18%, 0.8);
-    --secondary: hsl(215, 50%, 30%);
-    --secondary50: hsla(215, 50%, 30%, 0.5);
-    --muted: hsl(210, 20%, 70%);
-    --border: hsl(215, 30%, 35%);
-    --border30: hsla(215, 30%, 35%, 0.3);
-    --border20: hsla(215, 30%, 35%, 0.2);
-    --primary: hsl(0, 68%, 42%);
-    --primary20: hsla(0, 68%, 42%, 0.2);
-    --green: #4ade80;
-    --green20: rgba(34,197,94,0.2);
-    --green600: #16a34a;
-    --green400border: #4ade80;
-    --blue: #60a5fa;
-    --purple: #c084fc;
-    --amber: #fbbf24;
-    --emerald: #34d399;
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Inter',sans-serif;
+    background:#0a0f1a;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    position:relative;
+    overflow:hidden;
   }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--fg); background: var(--bg); }
-
-  .iceland-flag-bg {
-    background: linear-gradient(to bottom,
-      hsl(215,72%,33%) 0%, hsl(215,72%,33%) 32%,
-      #fff 32%, #fff 36%, hsl(0,68%,42%) 36%, hsl(0,68%,42%) 44%,
-      #fff 44%, #fff 48%, hsl(215,72%,33%) 48%, hsl(215,72%,33%) 52%,
-      #fff 52%, #fff 56%, hsl(0,68%,42%) 56%, hsl(0,68%,42%) 64%,
-      #fff 64%, #fff 68%, hsl(215,72%,33%) 68%, hsl(215,72%,33%) 100%);
+  /* Iceland flag background */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background:
+      linear-gradient(to right, #003897 38%, transparent 38%, transparent 42%, #fff 42%, #fff 44%, #D72828 44%, #D72828 56%, #fff 56%, #fff 58%, transparent 58%, transparent 62%, #003897 62%),
+      linear-gradient(to bottom, #003897 35%, #fff 35%, #fff 39%, #D72828 39%, #D72828 61%, #fff 61%, #fff 65%, #003897 65%);
+    background-blend-mode: multiply;
+    opacity:0.08;
+    z-index:0;
   }
-  .iceland-flag-overlay {
-    background: linear-gradient(to right,
-      hsl(215,72%,33%) 0%, hsl(215,72%,33%) 28%,
-      #fff 28%, #fff 32%, hsl(0,68%,42%) 32%, hsl(0,68%,42%) 40%,
-      #fff 40%, #fff 44%, hsl(215,72%,33%) 44%, hsl(215,72%,33%) 100%);
+  .card {
+    position:relative;
+    z-index:1;
+    max-width:420px;
+    width:100%;
+    background:rgba(18,22,36,0.85);
+    backdrop-filter:blur(30px);
+    border-radius:24px;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 25px 60px rgba(0,0,0,0.5);
+    overflow:hidden;
   }
+  .stripe { display:flex; height:6px; }
+  .stripe .blue { flex:1; background:#003897; }
+  .stripe .white { width:8%; background:#e8eaf0; }
+  .stripe .red { width:5%; background:#D72828; }
 
-  .flag-wrapper { min-height: 100vh; position: relative; }
-  .flag-overlay { position: absolute; inset: 0; opacity: 0.6; }
-  .content-layer { position: relative; z-index: 10; min-height: 100vh; background: hsla(215,50%,23%,0.85); backdrop-filter: blur(4px); }
+  .header { display:flex; align-items:center; gap:12px; padding:20px 24px 16px; }
+  .header img { width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid rgba(0,86,210,0.4); }
+  .header .info { flex:1; }
+  .header .name { font-size:14px; font-weight:700; color:#e8eaf0; }
+  .header .iban { font-size:11px; color:#7a8399; font-family:monospace; }
+  .header .bank { font-size:10px; color:#7a8399; text-transform:uppercase; letter-spacing:0.1em; }
 
-  /* Notification Banner */
-  .notification-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transform: translateY(-100%); transition: transform 0.5s ease; }
-  .notification-banner.active { transform: translateY(0); }
-  .notification-inner { background: var(--green600); border-bottom: 4px solid var(--green400border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-  .notification-content { max-width: 1100px; margin: 0 auto; padding: 1.25rem 1rem; display: flex; align-items: center; justify-content: space-between; }
-  .notification-left { display: flex; align-items: center; gap: 16px; }
-  .notification-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
-  .notification-icon svg { width: 24px; height: 24px; color: #fff; }
-  .notification-title { font-size: 1.125rem; font-weight: 700; color: #fff; letter-spacing: 0.025em; }
-  .notification-desc { font-size: 0.875rem; color: #bbf7d0; font-weight: 600; margin-top: 4px; }
-  .notification-close { color: rgba(255,255,255,0.8); font-size: 1.5rem; font-weight: 700; background: none; border: none; cursor: pointer; padding: 0 8px; }
-  .notification-close:hover { color: #fff; }
+  .divider { height:1px; background:rgba(255,255,255,0.06); margin:0 24px; }
 
-  /* Header */
-  header { border-bottom: 1px solid var(--border30); background: hsla(215,40%,18%,0.8); backdrop-filter: blur(12px); }
-  .header-inner { max-width: 1100px; margin: 0 auto; padding: 1rem; display: flex; align-items: center; justify-content: space-between; }
-  .logo-box { width: 40px; height: 40px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center; }
-  .logo-box svg { width: 20px; height: 20px; color: #fff; }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .header-left h1 { font-size: 1.125rem; font-weight: 700; }
-  .header-left p { font-size: 0.75rem; color: var(--muted); }
-  .header-right { display: flex; align-items: center; gap: 16px; }
-  .header-right svg { width: 20px; height: 20px; color: var(--muted); cursor: pointer; transition: color 0.2s; }
-  .header-right svg:hover { color: #fff; }
-  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary20); display: flex; align-items: center; justify-content: center; }
-  .avatar svg { width: 16px; height: 16px; color: var(--primary); }
-  .secure { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--muted); }
-  .secure svg { color: var(--green); width: 16px; height: 16px; }
+  .success-section { text-align:center; padding:32px 24px; }
+  .circle-wrap { position:relative; width:128px; height:128px; margin:0 auto 20px; }
+  .circle-wrap svg { width:100%; height:100%; transform:rotate(-90deg); }
+  .circle-bg { fill:none; stroke:rgba(255,255,255,0.06); stroke-width:6; }
+  .circle-fg { fill:none; stroke:#22c55e; stroke-width:6; stroke-linecap:round; stroke-dasharray:327; stroke-dashoffset:50; }
+  .check { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .check svg { width:40px; height:40px; color:#22c55e; }
+  .success-section h1 { font-size:20px; font-weight:700; color:#e8eaf0; margin-bottom:4px; }
+  .success-section p { font-size:14px; color:#7a8399; }
 
-  main { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem; }
+  .section { padding:20px 24px; }
+  .row { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .row:last-child { margin-bottom:0; }
+  .row .label { font-size:14px; color:#7a8399; }
+  .row .value { font-size:14px; font-weight:600; color:#e8eaf0; text-align:right; }
+  .row .value.mono { font-family:monospace; font-size:12px; }
+  .row .value.amount { font-size:24px; font-weight:800; }
 
-  /* Account Card */
-  .account-card { border-radius: 1rem; background: linear-gradient(135deg, var(--card), var(--secondary)); padding: 1.5rem; margin-bottom: 2rem; border: 1px solid var(--border30); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-  .account-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
-  .account-top-left { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 0.875rem; }
-  .account-top-left svg { width: 24px; height: 24px; }
-  .badge-active { font-size: 0.75rem; background: var(--green20); color: var(--green); padding: 4px 12px; border-radius: 9999px; font-weight: 500; }
-  .label { font-size: 0.875rem; color: var(--muted); margin-bottom: 2px; }
-  .holder-name { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 1rem; }
-  .balance { font-size: 3rem; font-weight: 700; letter-spacing: -0.025em; }
-  .balance span { font-size: 1.5rem; color: var(--muted); }
-  .account-bottom { margin-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .iban-info { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; color: var(--muted); }
-  .iban-info svg { width: 16px; height: 16px; }
+  .badge { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px; }
+  .badge.success { background:rgba(34,197,94,0.15); color:#22c55e; }
+  .badge.warning { background:rgba(234,179,8,0.15); color:#eab308; }
 
-  /* Buttons */
-  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; border: none; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
-  .btn:hover { opacity: 0.9; }
-  .btn-primary { background: var(--primary); color: #fff; }
-  .btn-outline { background: transparent; color: var(--fg); border: 1px solid var(--border); }
-  .btn svg { width: 16px; height: 16px; }
+  .hold-box { margin:0 24px 20px; border-radius:16px; border:1px solid rgba(234,179,8,0.25); background:rgba(234,179,8,0.04); padding:16px; }
+  .hold-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .hold-header .icon { color:#eab308; }
+  .hold-header span { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#eab308; }
+  .hold-box p { font-size:12px; color:rgba(232,234,240,0.75); line-height:1.7; margin-bottom:10px; }
+  .hold-box p strong { color:#e8eaf0; font-weight:600; }
+  .hold-inner { background:rgba(18,22,36,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px; }
+  .hold-inner .row { margin-bottom:8px; }
+  .hold-inner .row:last-child { margin-bottom:0; }
+  .hold-inner .label { font-size:12px; }
+  .hold-inner .value { font-size:13px; }
 
-  /* Quick Actions */
-  .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 2rem; }
-  .action-card { border-radius: 12px; background: var(--card80); border: 1px solid var(--border30); padding: 1rem; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s; }
-  .action-card:hover { background: var(--secondary50); }
-  .action-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--secondary); display: flex; align-items: center; justify-content: center; }
-  .action-icon svg { width: 20px; height: 20px; }
-  .action-label { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
-
-  /* Stats */
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
-  .stat-card { border-radius: 12px; background: var(--card80); border: 1px solid var(--border30); padding: 1rem; }
-  .stat-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.875rem; color: var(--muted); }
-  .stat-header svg { width: 16px; height: 16px; }
-  .stat-value { font-size: 1.25rem; font-weight: 700; }
-  .text-green { color: var(--green); }
-  .text-red { color: var(--primary); }
-  .text-blue { color: var(--blue); }
-
-  /* Transactions */
-  .tx-list { border-radius: 12px; background: var(--card80); border: 1px solid var(--border30); overflow: hidden; margin-bottom: 2rem; }
-  .tx-header { padding: 1rem; border-bottom: 1px solid var(--border30); display: flex; align-items: center; justify-content: space-between; }
-  .tx-header h3 { font-size: 1.125rem; font-weight: 600; }
-  .tx-header span { font-size: 0.75rem; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 4px; }
-  .tx-header span:hover { color: #fff; }
-  .tx-header span svg { width: 12px; height: 12px; }
-  .tx-row { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border20); transition: background 0.2s; }
-  .tx-row:hover { background: hsla(215,50%,30%,0.3); }
-  .tx-row:last-child { border-bottom: none; }
-  .tx-left { display: flex; align-items: center; gap: 12px; }
-  .tx-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .tx-icon svg { width: 16px; height: 16px; }
-  .tx-icon.credit { background: var(--green20); color: var(--green); }
-  .tx-icon.debit { background: var(--primary20); color: var(--primary); }
-  .tx-desc { font-size: 0.875rem; font-weight: 500; }
-  .tx-date { font-size: 0.75rem; color: var(--muted); }
-  .tx-amount { font-size: 0.875rem; font-weight: 600; }
-
-  /* Detail Cards */
-  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
-  .detail-card { border-radius: 12px; background: var(--card80); border: 1px solid var(--border30); padding: 1.25rem; }
-  .detail-card h4 { font-size: 0.875rem; font-weight: 600; margin-bottom: 12px; }
-  .detail-row { display: flex; justify-content: space-between; font-size: 0.875rem; padding: 4px 0; }
-  .detail-row .dl { color: var(--muted); }
-  .detail-row .dv { font-weight: 500; }
-
-  /* Footer */
-  .footer { text-align: center; padding: 1.5rem 0; border-top: 1px solid var(--border20); font-size: 0.75rem; color: var(--muted); }
-
-  /* Modal */
-  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; }
-  .modal-overlay.active { display: flex; }
-  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; max-width: 420px; width: 90%; }
-  .modal h2 { font-size: 1.125rem; font-weight: 600; margin-bottom: 4px; }
-  .modal .modal-desc { font-size: 0.875rem; color: var(--muted); margin-bottom: 1rem; }
-  .modal-details { background: var(--secondary50); border: 1px solid var(--border30); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
-  .modal-details .md-label { font-size: 0.75rem; color: var(--muted); }
-  .modal-details .md-value { font-size: 0.875rem; font-weight: 600; font-family: monospace; margin-bottom: 12px; }
-  .modal-details .md-value:last-child { margin-bottom: 0; }
-  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; }
-
-  @media (max-width: 700px) {
-    .balance { font-size: 2rem; }
-    .balance span { font-size: 1rem; }
-    .stats { grid-template-columns: 1fr; }
-    .quick-actions { grid-template-columns: repeat(2, 1fr); }
-    .detail-grid { grid-template-columns: 1fr; }
-    .iban-info span { font-size: 0.7rem; }
-    .secure { display: none; }
-  }
+  .security-footer { display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; border-top:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); }
+  .security-footer span { font-size:10px; color:#7a8399; }
+  .footer-text { text-align:center; font-size:10px; color:#7a8399; margin-top:16px; letter-spacing:0.05em; }
 </style>
 </head>
 <body>
-<!-- Notification Banner -->
-<div class="notification-banner" id="notification">
-  <div class="notification-inner">
-    <div class="notification-content">
-      <div class="notification-left">
-        <div class="notification-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
-        </div>
-        <div>
-          <div class="notification-title">✓ Successfully Withdraw and awaiting to be seen</div>
-          <div class="notification-desc">STAMPED AND VERIFIED APPLICATION REQUEST OF €100 for Balance</div>
-        </div>
+<div>
+<div class="card">
+  <div class="stripe">
+    <div class="blue"></div><div class="white"></div><div class="red"></div><div class="white"></div><div class="blue"></div>
+  </div>
+
+  <div class="header">
+    <!-- REPLACE src WITH YOUR PROFILE IMAGE PATH -->
+    <img src="profile.jpg" alt="Finnur Sturluson">
+    <div class="info">
+      <div class="name">Finnur Sturluson</div>
+      <div class="iban">IS48 0324 2600 0652 1305 5229 39</div>
+    </div>
+    <div><span class="bank">Íslandsbanki</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="success-section">
+    <div class="circle-wrap">
+      <svg viewBox="0 0 120 120">
+        <circle class="circle-bg" cx="60" cy="60" r="52"/>
+        <circle class="circle-fg" cx="60" cy="60" r="52"/>
+      </svg>
+      <div class="check">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       </div>
-      <button class="notification-close" onclick="document.getElementById('notification').classList.remove('active')">×</button>
+    </div>
+    <h1>Transfer Successful</h1>
+    <p>Your transaction has been successfully processed</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="row">
+      <span class="label">Deposit Amount</span>
+      <span class="value amount">€300,000</span>
+    </div>
+    <div class="row">
+      <span class="label">IBAN</span>
+      <span class="value mono">IS48 0324 2600 0652 1305 5229 39</span>
     </div>
   </div>
-</div>
 
-<div class="flag-wrapper iceland-flag-bg">
-  <div class="flag-overlay iceland-flag-overlay"></div>
-  <div class="content-layer">
-    <header>
-      <div class="header-inner">
-        <div class="header-left">
-          <div class="logo-box">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M12 6h.01M12 10h.01M12 14h.01M16 6h.01M16 10h.01M16 14h.01M8 6h.01M8 10h.01M8 14h.01M12 18h.01"/></svg>
-          </div>
-          <div>
-            <h1>Íslandsbanki</h1>
-            <p>Online Banking</p>
-          </div>
-        </div>
-        <div class="header-right">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-          <div class="avatar">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <div class="secure">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
-            <span>Secure Session</span>
-          </div>
-        </div>
-      </div>
-    </header>
+  <div class="divider"></div>
 
-    <main>
-      <!-- Account Card -->
-      <div class="account-card">
-        <div class="account-top">
-          <div class="account-top-left">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-            <span>Current Account</span>
-          </div>
-          <span class="badge-active">Active</span>
-        </div>
-        <p class="label">Account Holder</p>
-        <h2 class="holder-name">FINNUR STURLUSON</h2>
-        <p class="label">Available Balance</p>
-        <p class="balance" id="balanceDisplay">€300,000<span>.00</span></p>
-        <div class="account-bottom">
-          <div class="iban-info">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span>IBAN: IS48 0324 2600 0652 1305 5229 39</span>
-          </div>
-          <button class="btn btn-primary" id="withdrawBtn" onclick="document.getElementById('modal').classList.add('active')">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-            Withdraw
-          </button>
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="quick-actions">
-        <div class="action-card">
-          <div class="action-icon"><svg style="color:var(--blue)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 14-4-4-4 4"/><path d="M17 10v10"/></svg></div>
-          <span class="action-label">Transfer</span>
-        </div>
-        <div class="action-card">
-          <div class="action-icon"><svg style="color:var(--purple)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-          <span class="action-label">International</span>
-        </div>
-        <div class="action-card">
-          <div class="action-icon"><svg style="color:var(--amber)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div>
-          <span class="action-label">Investments</span>
-        </div>
-        <div class="action-card">
-          <div class="action-icon"><svg style="color:var(--emerald)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-          <span class="action-label">Analytics</span>
-        </div>
-      </div>
-
-      <!-- Stats -->
-      <div class="stats">
-        <div class="stat-card">
-          <div class="stat-header">
-            <svg style="color:var(--green)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 10 4 4 4-4"/><path d="M7 14V4"/></svg>
-            <span>Income (Apr)</span>
-          </div>
-          <p class="stat-value text-green">+€300,000.00</p>
-        </div>
-        <div class="stat-card">
-          <div class="stat-header">
-            <svg style="color:var(--primary)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 14-4-4-4 4"/><path d="M17 10v10"/></svg>
-            <span>Expenses (Apr)</span>
-          </div>
-          <p class="stat-value text-red" id="expensesDisplay">€0.00</p>
-        </div>
-        <div class="stat-card">
-          <div class="stat-header">
-            <svg style="color:var(--blue)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            <span>Net Balance</span>
-          </div>
-          <p class="stat-value" id="netDisplay">€300,000.00</p>
-        </div>
-      </div>
-
-      <!-- Transactions -->
-      <div class="tx-list">
-        <div class="tx-header">
-          <h3>Recent Transactions</h3>
-          <span>View All <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></span>
-        </div>
-        <div id="txRows">
-          <div class="tx-row">
-            <div class="tx-left">
-              <div class="tx-icon credit"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 10 4 4 4-4"/><path d="M7 14V4"/></svg></div>
-              <div><p class="tx-desc">Incoming Wire Transfer - Landsbankinn</p><p class="tx-date">2026-04-12 • Completed</p></div>
-            </div>
-            <p class="tx-amount text-green">+€300,000.00</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Detail Cards -->
-      <div class="detail-grid">
-        <div class="detail-card">
-          <h4>Account Details</h4>
-          <div class="detail-row"><span class="dl">Account Type</span><span class="dv">Current</span></div>
-          <div class="detail-row"><span class="dl">Currency</span><span class="dv">EUR (€)</span></div>
-          <div class="detail-row"><span class="dl">Branch</span><span class="dv">Reykjavík HQ</span></div>
-          <div class="detail-row"><span class="dl">Opened</span><span class="dv">Jan 2024</span></div>
-        </div>
-        <div class="detail-card">
-          <h4>Security Status</h4>
-          <div class="detail-row"><span class="dl">2FA</span><span class="dv" style="color:var(--green)">Enabled</span></div>
-          <div class="detail-row"><span class="dl">Last Login</span><span class="dv">Today, 09:41</span></div>
-          <div class="detail-row"><span class="dl">Session</span><span class="dv" style="color:var(--green)">Active</span></div>
-          <div class="detail-row"><span class="dl">IP Location</span><span class="dv">Reykjavík, IS</span></div>
-        </div>
-      </div>
-
-      <div class="footer">© 2026 Íslandsbanki hf. All rights reserved. Regulated by the Icelandic Financial Supervisory Authority.</div>
-    </main>
-  </div>
-</div>
-
-<!-- Modal -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <h2>Confirm Withdrawal</h2>
-    <p class="modal-desc">Please confirm the receiving account details below before proceeding.</p>
-    <div class="modal-details">
-      <p class="md-label">Receiving Account (IBAN)</p>
-      <p class="md-value">IS48 0324 2600 0652 1305 5229 39</p>
-      <p class="md-label">Account Holder</p>
-      <p class="md-value">FINNUR STURLUSON</p>
-      <p class="md-label">Amount</p>
-      <p class="md-value" style="margin-bottom:0">€300,000.00</p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="document.getElementById('modal').classList.remove('active')">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmWithdraw()">Confirm Withdraw</button>
+  <div class="section">
+    <div class="row"><span class="label">Receiver</span><span class="value">Finnur Sturluson</span></div>
+    <div class="row"><span class="label">Type</span><span class="value">Inbound ISK Deposit</span></div>
+    <div class="row"><span class="label">Ref.</span><span class="value mono">ISB-2026-0414-7839</span></div>
+    <div class="row"><span class="label">Date</span><span class="value">14 April 2026</span></div>
+    <div class="row">
+      <span class="label">Status</span>
+      <span class="badge success">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Payment Successful
+      </span>
     </div>
   </div>
+
+  <div class="divider"></div>
+
+  <div class="hold-box">
+    <div class="hold-header">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+      <span>Regulatory Hold — Action Required</span>
+    </div>
+    <p>In accordance with the <strong>Icelandic Financial Supervisory Authority (FME)</strong> and the <strong>Central Bank of Iceland — Foreign Exchange Act</strong>, all inbound cross-border transfers exceeding <strong>€250,000</strong> are subject to a mandatory government compliance review.</p>
+    <p>An <strong>Appeal &amp; Release Fee</strong> of <strong>€110.00</strong> is required to complete the regulatory clearance and release the funds to your account. This fee is a one-time statutory charge mandated under ISK capital control regulations.</p>
+    <div class="hold-inner">
+      <div class="row"><span class="label">Appeal & Release Fee</span><span class="value" style="font-weight:700">€110.00</span></div>
+      <div class="row">
+        <span class="label">Status</span>
+        <span class="badge warning">
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Unpaid
+        </span>
+      </div>
+      <div class="row"><span class="label">Fund Release</span><span class="value" style="font-size:12px;color:#7a8399">Pending Appeal Payment</span></div>
+    </div>
+  </div>
+
+  <div class="security-footer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#0056d2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+    <span>Protected under Icelandic Deposit Guarantee Scheme (TIF)</span>
+  </div>
+
+  <div class="stripe">
+    <div class="blue"></div><div class="white"></div><div class="red"></div><div class="white"></div><div class="blue"></div>
+  </div>
 </div>
-
-<script>
-function playNotificationSound() {
-  try {
-    var ctx = new (window.AudioContext || window.webkitAudioContext)();
-    function tone(freq, start, dur) {
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = freq;
-      osc.type = 'sine';
-      gain.gain.setValueAtTime(0.3, ctx.currentTime + start);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + dur);
-      osc.start(ctx.currentTime + start);
-      osc.stop(ctx.currentTime + start + dur);
-    }
-    tone(880, 0, 0.15);
-    tone(1100, 0.15, 0.15);
-    tone(1320, 0.3, 0.3);
-  } catch(e) {}
-}
-
-function confirmWithdraw() {
-  document.getElementById('modal').classList.remove('active');
-
-  // Update balance
-  document.getElementById('balanceDisplay').innerHTML = '€0<span>.00</span>';
-  document.getElementById('expensesDisplay').textContent = '-€300,000.00';
-  document.getElementById('netDisplay').textContent = '€0.00';
-
-  // Hide withdraw button
-  document.getElementById('withdrawBtn').style.display = 'none';
-
-  // Add withdrawal transaction
-  var txRows = document.getElementById('txRows');
-  var newRow = document.createElement('div');
-  newRow.className = 'tx-row';
-  newRow.innerHTML = '<div class="tx-left"><div class="tx-icon debit"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 14-4-4-4 4"/><path d="M17 10v10"/></svg></div><div><p class="tx-desc">Withdrawal - IS48 0324 2600 0652 1305 5229 39</p><p class="tx-date">2026-04-13 • Processing</p></div></div><p class="tx-amount text-red">-€300,000.00</p>';
-  txRows.appendChild(newRow);
-
-  // Show notification
-  playNotificationSound();
-  var notif = document.getElementById('notification');
-  notif.classList.add('active');
-  setTimeout(function() { notif.classList.remove('active'); }, 10000);
-}
-</script>
+<p class="footer-text">Secured by Íslandsbanki hf. • Regulated by the Central Bank of Iceland</p>
+</div>
 </body>
 </html>
