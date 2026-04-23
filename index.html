@@ -1,194 +1,470 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Íslandsbanki — Wire Transfer Receipt</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Landsbanki Íslands — Mobile Banking</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family:'Inter',sans-serif;
-    background:#0a0f1a;
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    position:relative;
-    overflow:hidden;
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #0b1e3f; background: #00205b; }
+
+  /* Iceland flag background — true proportions, blurred for depth */
+  .flag-bg {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden;
   }
-  /* Iceland flag background */
-  body::before {
-    content:'';
-    position:fixed;
-    inset:0;
+  .flag-bg::before {
+    content: ""; position: absolute; inset: -8%;
     background:
-      linear-gradient(to right, #003897 38%, transparent 38%, transparent 42%, #fff 42%, #fff 44%, #D72828 44%, #D72828 56%, #fff 56%, #fff 58%, transparent 58%, transparent 62%, #003897 62%),
-      linear-gradient(to bottom, #003897 35%, #fff 35%, #fff 39%, #D72828 39%, #D72828 61%, #fff 61%, #fff 65%, #003897 65%);
-    background-blend-mode: multiply;
-    opacity:0.08;
-    z-index:0;
+      /* Red cross (horizontal) */
+      linear-gradient(to bottom, transparent 0 44%, #d72828 44% 56%, transparent 56% 100%),
+      /* Red cross (vertical, offset like real flag) */
+      linear-gradient(to right, transparent 0 30%, #d72828 30% 42%, transparent 42% 100%),
+      /* White cross (horizontal) */
+      linear-gradient(to bottom, transparent 0 40%, #ffffff 40% 60%, transparent 60% 100%),
+      /* White cross (vertical) */
+      linear-gradient(to right, transparent 0 26%, #ffffff 26% 46%, transparent 46% 100%),
+      /* Blue field */
+      #00529b;
+    background-blend-mode: normal;
+    filter: saturate(1.05);
   }
-  .card {
-    position:relative;
-    z-index:1;
-    max-width:420px;
-    width:100%;
-    background:rgba(18,22,36,0.85);
-    backdrop-filter:blur(30px);
-    border-radius:24px;
-    border:1px solid rgba(255,255,255,0.08);
-    box-shadow:0 25px 60px rgba(0,0,0,0.5);
-    overflow:hidden;
+  .flag-bg::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,15,40,0.55) 0%, rgba(0,15,40,0.78) 55%, rgba(0,10,30,0.92) 100%);
+    backdrop-filter: blur(2px);
   }
-  .stripe { display:flex; height:6px; }
-  .stripe .blue { flex:1; background:#003897; }
-  .stripe .white { width:8%; background:#e8eaf0; }
-  .stripe .red { width:5%; background:#D72828; }
 
-  .header { display:flex; align-items:center; gap:12px; padding:20px 24px 16px; }
-  .header img { width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid rgba(0,86,210,0.4); }
-  .header .info { flex:1; }
-  .header .name { font-size:14px; font-weight:700; color:#e8eaf0; }
-  .header .iban { font-size:11px; color:#7a8399; font-family:monospace; }
-  .header .bank { font-size:10px; color:#7a8399; text-transform:uppercase; letter-spacing:0.1em; }
+  .app {
+    position: relative; z-index: 1; max-width: 480px; margin: 0 auto; min-height: 100vh;
+    padding: 14px 16px 110px; color: #fff;
+  }
 
-  .divider { height:1px; background:rgba(255,255,255,0.06); margin:0 24px; }
+  /* Top bar */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 4px 14px; }
+  .icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,0.08); color: #fff; font-size: 18px; border: none; }
+  .topbar h1 { font-size: 17px; font-weight: 600; letter-spacing: 0.2px; }
 
-  .success-section { text-align:center; padding:32px 24px; }
-  .circle-wrap { position:relative; width:128px; height:128px; margin:0 auto 20px; }
-  .circle-wrap svg { width:100%; height:100%; transform:rotate(-90deg); }
-  .circle-bg { fill:none; stroke:rgba(255,255,255,0.06); stroke-width:6; }
-  .circle-fg { fill:none; stroke:#22c55e; stroke-width:6; stroke-linecap:round; stroke-dasharray:327; stroke-dashoffset:50; }
-  .check { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
-  .check svg { width:40px; height:40px; color:#22c55e; }
-  .success-section h1 { font-size:20px; font-weight:700; color:#e8eaf0; margin-bottom:4px; }
-  .success-section p { font-size:14px; color:#7a8399; }
+  /* Card */
+  .card-wrap { padding: 4px 0 14px; }
+  .bank-card {
+    position: relative; aspect-ratio: 1.586 / 1; border-radius: 18px; overflow: hidden;
+    background:
+      radial-gradient(120% 80% at 100% 0%, rgba(255,255,255,0.18), transparent 50%),
+      linear-gradient(135deg, #002f6c 0%, #00529b 45%, #003d80 100%);
+    box-shadow: 0 22px 40px -18px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.12);
+    color: #fff;
+    padding: 18px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .bank-card::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 9px),
+      radial-gradient(60% 40% at 20% 100%, rgba(215,40,40,0.25), transparent 70%);
+    pointer-events: none;
+  }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; }
+  .bank-mark { display: flex; align-items: center; gap: 10px; }
+  .bank-mark .crest {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: linear-gradient(135deg, #fff, #e6ecf5);
+    color: #002f6c; display: grid; place-items: center; font-weight: 800; font-size: 16px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+  }
+  .card-avatar {
+    position: absolute; top: 14px; right: 14px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(255,255,255,0.85);
+    border: 2px solid rgba(255,255,255,0.95);
+    box-shadow: 0 6px 14px -4px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(0,0,0,0.06);
+    display: grid; place-items: center; overflow: hidden; z-index: 2;
+  }
+  .card-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card-avatar .ph {
+    color: #5b6a8a; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-align: center; padding: 0 4px;
+  }
+  /* Move the Virtual pill so it doesn't collide with avatar */
+  .bank-card .pill { margin-right: 64px; }
+  .bank-mark .name { font-size: 13px; letter-spacing: 1.4px; font-weight: 700; text-transform: uppercase; opacity: 0.95; }
+  .pill { font-size: 10.5px; padding: 4px 9px; border-radius: 20px; background: rgba(255,255,255,0.18); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+  .chip {
+    width: 42px; height: 30px; border-radius: 6px;
+    background: linear-gradient(135deg, #d4af37, #b8860b 60%, #8a6508);
+    position: relative; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.25);
+  }
+  .chip::after {
+    content: ""; position: absolute; inset: 4px;
+    background:
+      linear-gradient(to right, transparent 32%, rgba(0,0,0,0.25) 32% 34%, transparent 34% 64%, rgba(0,0,0,0.25) 64% 66%, transparent 66%),
+      linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.25) 30% 32%, transparent 32% 66%, rgba(0,0,0,0.25) 66% 68%, transparent 68%);
+  }
+  .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; position: relative; }
+  .holder { letter-spacing: 1.5px; font-weight: 600; font-size: 14px; text-transform: uppercase; }
+  .holder small { display: block; font-size: 9px; letter-spacing: 1.4px; opacity: 0.7; font-weight: 500; margin-bottom: 4px; }
+  .scheme { font-style: italic; font-weight: 800; font-size: 22px; letter-spacing: 1px; }
+  .scheme small { display: block; font-style: normal; font-weight: 500; font-size: 9.5px; letter-spacing: 1.3px; opacity: 0.85; text-align: right; margin-top: 2px; }
 
-  .section { padding:20px 24px; }
-  .row { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-  .row:last-child { margin-bottom:0; }
-  .row .label { font-size:14px; color:#7a8399; }
-  .row .value { font-size:14px; font-weight:600; color:#e8eaf0; text-align:right; }
-  .row .value.mono { font-family:monospace; font-size:12px; }
-  .row .value.amount { font-size:24px; font-weight:800; }
+  /* Balance panel */
+  .panel { background: rgba(8, 14, 30, 0.78); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 18px 16px; margin-top: 16px; backdrop-filter: blur(8px); }
+  .balance-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .balance-label { font-size: 13px; color: #b9c2d6; display: flex; align-items: center; gap: 6px; }
+  .send-btn {
+    background: linear-gradient(180deg, #d72828, #a81d1d);
+    color: #fff; border: none; padding: 10px 22px; border-radius: 24px; font-weight: 700; font-size: 14px;
+    box-shadow: 0 8px 18px -8px rgba(215,40,40,0.7);
+    letter-spacing: 0.5px;
+  }
+  .send-btn:active { transform: translateY(1px); }
+  .balance-amount { margin-top: 8px; font-size: 36px; font-weight: 700; letter-spacing: -0.5px; }
+  .balance-amount span { font-size: 14px; color: #b9c2d6; font-weight: 500; margin-left: 6px; }
 
-  .badge { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px; }
-  .badge.success { background:rgba(34,197,94,0.15); color:#22c55e; }
-  .badge.warning { background:rgba(234,179,8,0.15); color:#eab308; }
+  .divider { height: 1px; background: rgba(255,255,255,0.08); margin: 16px -16px; }
 
-  .hold-box { margin:0 24px 20px; border-radius:16px; border:1px solid rgba(234,179,8,0.25); background:rgba(234,179,8,0.04); padding:16px; }
-  .hold-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
-  .hold-header .icon { color:#eab308; }
-  .hold-header span { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#eab308; }
-  .hold-box p { font-size:12px; color:rgba(232,234,240,0.75); line-height:1.7; margin-bottom:10px; }
-  .hold-box p strong { color:#e8eaf0; font-weight:600; }
-  .hold-inner { background:rgba(18,22,36,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px; }
-  .hold-inner .row { margin-bottom:8px; }
-  .hold-inner .row:last-child { margin-bottom:0; }
-  .hold-inner .label { font-size:12px; }
-  .hold-inner .value { font-size:13px; }
+  .sub-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .sub-grid .col small { display: block; color: #8c97b0; font-size: 12px; margin-bottom: 4px; }
+  .sub-grid .col strong { font-size: 15px; font-weight: 600; }
+  .sub-grid .col.pay-with strong { display: flex; gap: -6px; }
+  .sub-grid .col.pay-with strong i { width: 22px; height: 22px; border-radius: 50%; display: inline-block; margin-left: -6px; border: 2px solid #0b1326; }
+  .i-eur { background: linear-gradient(135deg, #003399, #0052cc); }
+  .i-usd { background: linear-gradient(135deg, #1a936f, #114b5f); }
+  .i-isk { background: linear-gradient(135deg, #d72828, #8b1a1a); }
 
-  .security-footer { display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; border-top:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); }
-  .security-footer span { font-size:10px; color:#7a8399; }
-  .footer-text { text-align:center; font-size:10px; color:#7a8399; margin-top:16px; letter-spacing:0.05em; }
+  /* Quick actions */
+  .actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 18px; }
+  .action { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #fff; }
+  .action .ic {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); display: grid; place-items: center; font-size: 22px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .action span { font-size: 12px; }
+
+  /* Info cards */
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+  .info {
+    background: rgba(8,14,30,0.78); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 14px; color: #fff;
+  }
+  .info small { color: #8c97b0; font-size: 11.5px; }
+  .info .v { display: block; font-size: 16px; font-weight: 700; margin-top: 6px; }
+  .badge { display: inline-block; margin-top: 8px; font-size: 11px; padding: 4px 8px; border-radius: 12px; font-weight: 700; }
+  .badge.gold { background: linear-gradient(90deg,#f4c542,#d99a1c); color: #1a1300; }
+  .badge.green { background: rgba(34,197,94,0.18); color: #4ade80; border: 1px solid rgba(34,197,94,0.35); }
+
+  /* Transactions */
+  .section-title { display: flex; justify-content: space-between; align-items: center; margin: 22px 4px 10px; color: #fff; }
+  .section-title h2 { font-size: 15px; font-weight: 600; }
+  .section-title a { color: #8aa9ff; font-size: 12px; text-decoration: none; }
+  .tx-list { background: rgba(8,14,30,0.78); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; overflow: hidden; }
+  .tx { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff; }
+  .tx:last-child { border-bottom: none; }
+  .tx .ic { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.08); display: grid; place-items: center; font-size: 16px; }
+  .tx .meta { flex: 1; min-width: 0; }
+  .tx .meta b { display: block; font-size: 13.5px; font-weight: 600; }
+  .tx .meta small { color: #8c97b0; font-size: 11.5px; }
+  .tx .amt { font-size: 13.5px; font-weight: 700; }
+  .tx .amt.in { color: #4ade80; }
+  .tx .amt.out { color: #fca5a5; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    max-width: 480px; margin: 0 auto;
+    background: rgba(5, 10, 24, 0.92); backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    padding: 10px 6px calc(10px + env(safe-area-inset-bottom));
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #8c97b0; font-size: 11px; }
+  .nav-item.active { color: #fff; }
+  .nav-item .ic { font-size: 20px; }
+
+  /* Loading overlay */
+  .overlay { position: fixed; inset: 0; background: rgba(2,6,18,0.78); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 50; }
+  .overlay.show { display: flex; }
+  .loader-card { width: min(86vw, 360px); background: #0b1326; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 20px; color: #fff; text-align: center; box-shadow: 0 30px 60px -10px rgba(0,0,0,0.6); }
+  .spinner { width: 56px; height: 56px; margin: 4px auto 14px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.12); border-top-color: #d72828; border-right-color: #fff; animation: spin 0.9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-card h3 { font-size: 16px; margin-bottom: 6px; }
+  .loader-card p { color: #b9c2d6; font-size: 12.5px; line-height: 1.5; }
+  .progress { height: 6px; background: rgba(255,255,255,0.08); border-radius: 6px; overflow: hidden; margin-top: 14px; }
+  .progress > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #d72828, #ffffff, #00529b); transition: width 0.2s linear; }
+  .steps { margin-top: 12px; text-align: left; font-size: 12px; color: #b9c2d6; }
+  .steps div { padding: 4px 0; opacity: 0.45; transition: opacity 0.3s ease, color 0.3s ease; }
+  .steps div.active { opacity: 1; color: #fff; }
+  .steps div.done { opacity: 1; color: #4ade80; }
+
+  /* Error popup */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 60; padding: 20px; }
+  .modal.show { display: flex; }
+  .modal-card { width: 100%; max-width: 380px; background: #0b1326; border: 1px solid rgba(255,80,80,0.35); border-radius: 18px; overflow: hidden; color: #fff; box-shadow: 0 30px 60px -10px rgba(0,0,0,0.7); }
+  .modal-head { padding: 18px 18px 6px; display: flex; gap: 12px; align-items: flex-start; }
+  .err-ic { width: 44px; height: 44px; border-radius: 50%; background: rgba(215,40,40,0.18); border: 1px solid rgba(215,40,40,0.4); display: grid; place-items: center; font-size: 22px; flex-shrink: 0; }
+  .modal-head h4 { font-size: 16px; font-weight: 700; }
+  .modal-head small { color: #fca5a5; font-size: 11.5px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .modal-body { padding: 8px 18px 18px; color: #cbd2e0; font-size: 13px; line-height: 1.55; }
+  .modal-body .alert {
+    margin-top: 12px; background: rgba(215,40,40,0.1); border: 1px solid rgba(215,40,40,0.35);
+    border-radius: 10px; padding: 10px 12px; font-size: 12.5px; color: #fecaca;
+  }
+  .modal-body .ref {
+    margin-top: 10px; display: flex; justify-content: space-between; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px; color: #8c97b0;
+  }
+  .modal-foot { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px 14px 16px; }
+  .btn { padding: 11px 14px; border-radius: 10px; border: none; font-size: 13px; font-weight: 700; }
+  .btn.ghost { background: rgba(255,255,255,0.08); color: #fff; }
+  .btn.primary { background: linear-gradient(180deg,#d72828,#a81d1d); color: #fff; }
 </style>
 </head>
 <body>
-<div>
-<div class="card">
-  <div class="stripe">
-    <div class="blue"></div><div class="white"></div><div class="red"></div><div class="white"></div><div class="blue"></div>
+
+<div class="flag-bg" aria-hidden="true"></div>
+
+<div class="app">
+  <!-- Top bar -->
+  <div class="topbar">
+    <button class="icon-btn" aria-label="Back">‹</button>
+    <h1>Landsbanki Card</h1>
+    <button class="icon-btn" aria-label="Menu">⋯</button>
   </div>
 
-  <div class="header">
-    <!-- REPLACE src WITH YOUR PROFILE IMAGE PATH -->
-    <img src="a6782889-ed93-474c-9714-4250ca15930c.jpeg" alt="Finnur Sturluson">
+  <!-- Card -->
+  <div class="card-wrap">
+    <div class="bank-card">
+      <div class="card-top">
+        <div class="bank-mark">
+          <div class="crest">L</div>
+          <div>
+            <div class="name">Landsbanki Íslands</div>
+            <div style="font-size:9.5px; opacity:0.7; letter-spacing:1px;">PLATINUM CURRENT ACCOUNT</div>
+          </div>
+        </div>
+        <div class="pill">Virtual</div>
+      </div>
+      <!-- Profile photo placeholder — replace src below with your image -->
+      <div class="card-avatar" aria-label="Cardholder photo">
+        <img src="" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';" />
+        <div class="ph" style="display:grid; place-items:center; width:100%; height:100%;">PHOTO</div>
+      </div>
+      <div class="chip" aria-hidden="true"></div>
+      <div class="card-bottom">
+        <div class="holder">
+          <small>CARD HOLDER</small>
+          Finnur Sturlson
+        </div>
+        <div class="scheme">
+          VISA
+          <small>Platinum Business</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Balance panel -->
+  <div class="panel">
+    <div class="balance-row">
+      <div>
+        <div class="balance-label">Available Balance 👁</div>
+        <div class="balance-amount">€300,000.00 <span>EUR</span></div>
+      </div>
+      <button class="send-btn" id="sendBtn">Send Out</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="sub-grid">
+      <div class="col">
+        <small>Fiat</small>
+        <strong>€300,000.00</strong>
+      </div>
+      <div class="col">
+        <small>Crypto ⓘ</small>
+        <strong>€0.00</strong>
+      </div>
+      <div class="col pay-with">
+        <small>Pay With ›</small>
+        <strong>
+          <i class="i-eur"></i>
+          <i class="i-usd"></i>
+          <i class="i-isk"></i>
+        </strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="actions">
+    <div class="action"><div class="ic">🏠</div><span>Rewards</span></div>
+    <div class="action"><div class="ic">👤</div><span>Referral</span></div>
+    <div class="action"><div class="ic">💳</div><span>My Cards</span></div>
+    <div class="action"><div class="ic">📄</div><span>Activity</span></div>
+  </div>
+
+  <!-- Info -->
+  <div class="info-grid">
     <div class="info">
-      <div class="name">Finnur Sturluson</div>
-      <div class="iban">IS48 0324 2600 0652 1305 5229 39</div>
+      <small>Auto Cashback</small>
+      <span class="v">+€0.00 EUR</span>
+      <span class="badge gold">Base: 2% cashback</span>
     </div>
-    <div><span class="bank">Íslandsbanki</span></div>
-  </div>
-
-  <div class="divider"></div>
-
-  <div class="success-section">
-    <div class="circle-wrap">
-      <svg viewBox="0 0 120 120">
-        <circle class="circle-bg" cx="60" cy="60" r="52"/>
-        <circle class="circle-fg" cx="60" cy="60" r="52"/>
-      </svg>
-      <div class="check">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      </div>
-    </div>
-    <h1>Transfer Successful</h1>
-    <p>Your transaction has been successfully processed</p>
-  </div>
-
-  <div class="divider"></div>
-
-  <div class="section">
-    <div class="row">
-      <span class="label">Deposit Amount</span>
-      <span class="value amount">€300,000</span>
-    </div>
-    <div class="row">
-      <span class="label">IBAN</span>
-      <span class="value mono">IS48 0324 2600 0652 1305 5229 39</span>
+    <div class="info">
+      <small>Auto-Earn</small>
+      <span class="v">€0.00 EUR daily</span>
+      <span class="badge green">● ACTIVE</span>
     </div>
   </div>
 
-  <div class="divider"></div>
-
-  <div class="section">
-    <div class="row"><span class="label">Receiver</span><span class="value">Finnur Sturluson</span></div>
-    <div class="row"><span class="label">Type</span><span class="value">Inbound ISK Deposit</span></div>
-    <div class="row"><span class="label">Ref.</span><span class="value mono">ISB-2026-0414-7839</span></div>
-    <div class="row"><span class="label">Date</span><span class="value">14 April 2026</span></div>
-    <div class="row">
-      <span class="label">Status</span>
-      <span class="badge success">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Payment Successful
-      </span>
+  <!-- Account details -->
+  <div class="section-title"><h2>Account Details</h2><a href="#">Manage</a></div>
+  <div class="panel" style="margin-top:0;">
+    <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:13px;">
+      <span style="color:#8c97b0;">IBAN</span>
+      <span style="font-family:ui-monospace,monospace;">IS48 0324 2600 0652 1305 5229 39</span>
+    </div>
+    <div style="height:1px;background:rgba(255,255,255,0.05);margin:6px 0;"></div>
+    <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:13px;">
+      <span style="color:#8c97b0;">SWIFT/BIC</span>
+      <span style="font-family:ui-monospace,monospace;">NBIIISRE</span>
+    </div>
+    <div style="height:1px;background:rgba(255,255,255,0.05);margin:6px 0;"></div>
+    <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:13px;">
+      <span style="color:#8c97b0;">Branch</span>
+      <span>Reykjavík — Austurstræti</span>
+    </div>
+    <div style="height:1px;background:rgba(255,255,255,0.05);margin:6px 0;"></div>
+    <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:13px;">
+      <span style="color:#8c97b0;">Account Status</span>
+      <span style="color:#4ade80; font-weight:600;">● Verified</span>
     </div>
   </div>
 
-  <div class="divider"></div>
-
-  <div class="hold-box">
-    <div class="hold-header">
-      <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
-      <span>Regulatory Hold — Action Required</span>
+  <!-- Transactions -->
+  <div class="section-title"><h2>Recent Transactions</h2><a href="#">See all</a></div>
+  <div class="tx-list">
+    <div class="tx">
+      <div class="ic">⬇</div>
+      <div class="meta"><b>Incoming Transfer</b><small>Today, 09:42 · Ref. LBI-9921</small></div>
+      <div class="amt in">+€300,000.00</div>
     </div>
-    <p>In accordance with the <strong>Icelandic Financial Supervisory Authority (FME)</strong> and the <strong>Central Bank of Iceland — Foreign Exchange Act</strong>, all inbound cross-border transfers exceeding <strong>€250,000</strong> are subject to a mandatory government compliance review.</p>
-    <p>An <strong>Appeal &amp; Release Fee</strong> of <strong>€110.00</strong> is required to complete the regulatory clearance and release the funds to your account. This fee is a one-time statutory charge mandated under ISK capital control regulations.</p>
-    <div class="hold-inner">
-      <div class="row"><span class="label">Appeal & Release Fee</span><span class="value" style="font-weight:700">€110.00</span></div>
-      <div class="row">
-        <span class="label">Status</span>
-        <span class="badge warning">
-          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Unpaid
-        </span>
-      </div>
-      <div class="row"><span class="label">Fund Release</span><span class="value" style="font-size:12px;color:#7a8399">Pending Appeal Payment</span></div>
-    </div>
-  </div>
-
-  <div class="security-footer">
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#0056d2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
-    <span>Protected under Icelandic Deposit Guarantee Scheme (TIF)</span>
-  </div>
-
-  <div class="stripe">
-    <div class="blue"></div><div class="white"></div><div class="red"></div><div class="white"></div><div class="blue"></div>
   </div>
 </div>
-<p class="footer-text">Secured by Íslandsbanki hf. • Regulated by the Central Bank of Iceland</p>
+
+<!-- Bottom nav -->
+<nav class="bottom-nav">
+  <div class="nav-item active"><div class="ic">🏦</div>Home</div>
+  <div class="nav-item"><div class="ic">📊</div>Markets</div>
+  <div class="nav-item"><div class="ic">↔</div>Transfers</div>
+  <div class="nav-item"><div class="ic">👤</div>Profile</div>
+</nav>
+
+<!-- Loading overlay -->
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="loader-card" role="status" aria-live="polite">
+    <div class="spinner"></div>
+    <h3>Processing Outbound Transfer</h3>
+    <p>Securely contacting the SEPA settlement network. Please do not close the application.</p>
+    <div class="progress"><i id="bar"></i></div>
+    <div class="steps" id="steps">
+      <div data-step="1">● Verifying account credentials…</div>
+      <div data-step="2">● Establishing secure SEPA channel…</div>
+      <div data-step="3">● Submitting to Landsbanki settlement core…</div>
+      <div data-step="4">● Awaiting ATM clearing-house authorization…</div>
+    </div>
+  </div>
 </div>
+
+<!-- Error popup -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-card" role="alertdialog" aria-labelledby="errTitle">
+    <div class="modal-head">
+      <div class="err-ic">⚠</div>
+      <div>
+        <small>Transaction Held</small>
+        <h4 id="errTitle">ATM System Dispute Settlement Required</h4>
+      </div>
+    </div>
+    <div class="modal-body">
+      Your outbound transfer of <b>€300,000.00</b> has been securely held by the
+      Landsbanki Íslands clearing department. Before the funds can be released and
+      reflected in the recipient's bank account, a mandatory <b>€200.00 ATM System
+      Dispute Settlement</b> fee must be paid to release the inter-bank lock.
+      <div class="alert">
+        ⚠ Failure to settle the €200.00 dispute fee will result in the
+        <b>€300,000.00</b> not being visible in the destination bank account.
+      </div>
+      <div style="margin-top:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 12px;">
+        <div style="font-size:11px; color:#8c97b0; letter-spacing:0.6px; text-transform:uppercase; margin-bottom:4px;">Receipt Account Number</div>
+        <div style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; color:#fff; word-break:break-all;">IS480324260006521305522939</div>
+      </div>
+      <div class="ref">
+        <span>REF</span>
+        <span>LBI-ATM-DSP-3007-99421</span>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" id="cancelBtn">Cancel</button>
+      <button class="btn primary" id="payBtn">Pay €200.00</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const sendBtn = document.getElementById('sendBtn');
+  const overlay = document.getElementById('overlay');
+  const bar = document.getElementById('bar');
+  const stepsEl = document.getElementById('steps');
+  const modal = document.getElementById('modal');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const payBtn = document.getElementById('payBtn');
+
+  function startTransfer() {
+    overlay.classList.add('show');
+    bar.style.width = '0%';
+    const steps = stepsEl.querySelectorAll('div');
+    steps.forEach(s => s.classList.remove('active','done'));
+
+    const total = 6000;
+    const start = performance.now();
+    const stepTimes = [0, 1500, 3000, 4500];
+
+    function tick(now) {
+      const elapsed = now - start;
+      const pct = Math.min(100, (elapsed / total) * 100);
+      bar.style.width = pct.toFixed(1) + '%';
+
+      stepTimes.forEach((t, i) => {
+        if (elapsed >= t) {
+          steps.forEach(s => s.classList.remove('active'));
+          if (i > 0) steps[i-1].classList.add('done');
+          steps[i].classList.add('active');
+        }
+      });
+
+      if (elapsed < total) {
+        requestAnimationFrame(tick);
+      } else {
+        steps.forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
+        setTimeout(() => {
+          overlay.classList.remove('show');
+          modal.classList.add('show');
+        }, 250);
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  sendBtn.addEventListener('click', startTransfer);
+  cancelBtn.addEventListener('click', () => modal.classList.remove('show'));
+  payBtn.addEventListener('click', () => {
+    payBtn.textContent = 'Redirecting…';
+    payBtn.disabled = true;
+    setTimeout(() => {
+      payBtn.textContent = 'Pay €200.00';
+      payBtn.disabled = false;
+      modal.classList.remove('show');
+    }, 1400);
+  });
+</script>
 </body>
 </html>
